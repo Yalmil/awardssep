@@ -1,64 +1,140 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>Hello World Login</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GameZone - Diversión sin límites</title>
   <style>
+    /* Fuentes y colores */
+    @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
     body {
+      font-family: 'Roboto', sans-serif;
+      margin: 0;
+      padding: 0;
+      background: linear-gradient(135deg, #1e3c72, #2a5298);
+      color: #fff;
       display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      background: #0f172a;
-      font-family: Arial, sans-serif;
+      flex-direction: column;
+      min-height: 100vh;
     }
-    h1 {
-      color: #38bdf8;
+
+    header {
+      text-align: center;
+      padding: 2rem;
+      background-color: rgba(0,0,0,0.5);
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 3rem;
+      letter-spacing: 2px;
+      color: #ffdd57;
+    }
+
+    header p {
+      font-size: 1.2rem;
+      color: #fff;
+    }
+
+    main {
+      flex: 1;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 1.5rem;
+      padding: 2rem;
+    }
+
+    .game-card {
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 15px;
+      overflow: hidden;
+      text-align: center;
+      transition: transform 0.3s, box-shadow 0.3s;
       cursor: pointer;
-      transition: 0.3s;
-      user-select: none;
     }
-    h1:hover {
-      color: #facc15;
+
+    .game-card:hover {
+      transform: translateY(-10px);
+      box-shadow: 0 15px 30px rgba(0,0,0,0.5);
+    }
+
+    .game-card img {
+      width: 100%;
+      height: 150px;
+      object-fit: cover;
+    }
+
+    .game-card h2 {
+      margin: 1rem 0 0.5rem 0;
+      font-size: 1.5rem;
+      color: #ffdd57;
+    }
+
+    .game-card p {
+      margin: 0 1rem 1rem 1rem;
+      font-size: 1rem;
+    }
+
+    footer {
+      text-align: center;
+      padding: 1rem;
+      background-color: rgba(0,0,0,0.5);
+      font-size: 0.9rem;
+    }
+
+    /* Botón flotante para un toque divertido */
+    .float-button {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background-color: #ffdd57;
+      color: #1e3c72;
+      border: none;
+      padding: 1rem 1.5rem;
+      border-radius: 50px;
+      font-weight: bold;
+      cursor: pointer;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+      transition: transform 0.2s;
+    }
+
+    .float-button:hover {
       transform: scale(1.1);
     }
   </style>
 </head>
 <body>
-  <h1 id="loginBtn">Hello world</h1>
 
-  <script type="module">
-    // Import Firebase
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-app.js";
-    import { getAuth, signInWithPopup, GoogleAuthProvider } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-auth.js";
+  <header>
+    <h1>GameZone</h1>
+    <p>Explora y juega tus juegos favoritos directamente desde tu navegador!</p>
+  </header>
 
-    // Tu configuración de Firebase
-    const firebaseConfig = {
-      apiKey: "AIzaSyDj9relnAX5se46pRmzZpBYE2c-Phndtvs",
-      authDomain: "login-sepawards.firebaseapp.com",
-      databaseURL: "https://login-sepawards-default-rtdb.firebaseio.com",
-      projectId: "login-sepawards",
-      storageBucket: "login-sepawards.firebasestorage.app",
-      messagingSenderId: "224966270314",
-      appId: "1:224966270314:web:2201fb1d8c4791621ad913"
-    };
+  <main>
+    <div class="game-card">
+      <img src="https://placekitten.com/400/200" alt="Juego 1">
+      <h2>Juego 1</h2>
+      <p>Un juego divertido y adictivo para pasar el tiempo.</p>
+    </div>
 
-    // Inicializar Firebase
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const provider = new GoogleAuthProvider();
+    <div class="game-card">
+      <img src="https://placekitten.com/401/200" alt="Juego 2">
+      <h2>Juego 2</h2>
+      <p>Desafía tus habilidades y diviértete sin parar.</p>
+    </div>
 
-    // Evento de click
-    document.getElementById("loginBtn").addEventListener("click", async () => {
-      try {
-        const result = await signInWithPopup(auth, provider);
-        const user = result.user;
-        alert(`Bienvenido ${user.displayName}!`);
-        console.log(user);
-      } catch (error) {
-        console.error("Error en login:", error);
-      }
-    });
-  </script>
+    <div class="game-card">
+      <img src="https://placekitten.com/402/200" alt="Juego 3">
+      <h2>Juego 3</h2>
+      <p>Explora mundos increíbles y supera los retos.</p>
+    </div>
+  </main>
+
+  <button class="float-button">¡Jugar ahora!</button>
+
+  <footer>
+    &copy; 2025 GameZone | Todos los derechos reservados
+  </footer>
+
 </body>
 </html>
