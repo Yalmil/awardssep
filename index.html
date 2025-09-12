@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Hello World Login</title>
+  <style>
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      background: #0f172a;
+      font-family: Arial, sans-serif;
+    }
+    h1 {
+      color: #38bdf8;
+      cursor: pointer;
+      transition: 0.3s;
+      user-select: none;
+    }
+    h1:hover {
+      color: #facc15;
+      transform: scale(1.1);
+    }
+  </style>
+</head>
+<body>
+  <h1 id="loginBtn">Hello world</h1>
+
+  <script type="module">
+    // Import Firebase
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-app.js";
+    import { getAuth, signInWithPopup, GoogleAuthProvider } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-auth.js";
+
+    // Tu configuración de Firebase
+    const firebaseConfig = {
+      apiKey: "AIzaSyDj9relnAX5se46pRmzZpBYE2c-Phndtvs",
+      authDomain: "login-sepawards.firebaseapp.com",
+      databaseURL: "https://login-sepawards-default-rtdb.firebaseio.com",
+      projectId: "login-sepawards",
+      storageBucket: "login-sepawards.firebasestorage.app",
+      messagingSenderId: "224966270314",
+      appId: "1:224966270314:web:2201fb1d8c4791621ad913"
+    };
+
+    // Inicializar Firebase
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const provider = new GoogleAuthProvider();
+
+    // Evento de click
+    document.getElementById("loginBtn").addEventListener("click", async () => {
+      try {
+        const result = await signInWithPopup(auth, provider);
+        const user = result.user;
+        alert(`Bienvenido ${user.displayName}!`);
+        console.log(user);
+      } catch (error) {
+        console.error("Error en login:", error);
+      }
+    });
+  </script>
+</body>
+</html>
