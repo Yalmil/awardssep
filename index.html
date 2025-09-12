@@ -30,8 +30,10 @@
       border: 1px solid rgba(255,150,30,0.12);
       position:relative;
       overflow:hidden;
+      z-index:1; /* asegurar por encima de los pseudo elementos */
     }
 
+    /* Neon glow decorative stripes */
     .card::before, .card::after{
       content:'';
       position:absolute;
@@ -39,9 +41,14 @@
       filter:blur(40px);
       opacity:0.22;
       transform:rotate(25deg);
+      pointer-events: none; /* <- importante: dejar pasar clicks */
+      z-index:0;
     }
     .card::before{background:radial-gradient(circle, #ffd86b 0%, transparent 40%);left:-120px;top:-100px}
     .card::after{background:radial-gradient(circle, #ff7a00 0%, transparent 40%);right:-120px;bottom:-120px}
+
+    /* Asegurar que el contenido esté encima (por si acaso) */
+    .card > * { position: relative; z-index: 2; }
 
     h1{
       font-size:2.25rem;
@@ -69,6 +76,7 @@
       box-shadow: 0 6px 18px rgba(255,140,30,0.12), 0 0 40px rgba(255,140,30,0.06) inset;
       transition:transform .12s ease, box-shadow .12s ease;
       margin-top:12px;
+      user-select: none;
     }
     .btn-google:active,.btn-logout:active{transform:translateY(1px)}
     .btn-google:hover,.btn-logout:hover{box-shadow: 0 10px 30px rgba(255,140,30,0.18), 0 0 60px rgba(255,140,30,0.08) inset}
@@ -97,11 +105,11 @@
 </head>
 <body>
   <main class="card" role="main">
-    <h1>Bienvenido a Minecraft Sep Awards</h1>
+    <h1>Bienvenido a MCA Neon</h1>
     <p class="lead">Inicia sesión con tu cuenta de Google para continuar.</p>
 
-    <button id="btnGoogle" class="btn-google">
-      <span class="google-logo">
+    <button id="btnGoogle" class="btn-google" type="button" aria-label="Iniciar sesión con Google">
+      <span class="google-logo" aria-hidden="true">
         <svg width="20" height="20" viewBox="0 0 256 262" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid">
           <path d="M255.7 133.4c0-8.7-.8-17-2.4-25.1H130v47.6h71.2c-3 17.2-12.6 31.8-26.8 41.6v34h43.3c25.3-23.3 40-57.7 40-98.1z" fill="#4285F4"/>
           <path d="M130 261c35 0 64.3-11.6 85.7-31.5l-43.3-34c-11.9 8-27.2 12.8-42.4 12.8-32.6 0-60.2-22-70.1-51.5H15.7v32.3C37 227.2 80.8 261 130 261z" fill="#34A853"/>
@@ -115,75 +123,86 @@
     <div class="profile" id="profile" style="display:none;">
       <img id="userPic" alt="Foto de perfil">
       <p id="userName"></p>
-      <button class="btn-logout" id="btnLogout">Cerrar sesión</button>
+      <button class="btn-logout" id="btnLogout" type="button">Cerrar sesión</button>
     </div>
+
+    <div class="small">Si la ventana se cierra sola, revisa <b>Authorized domains</b> en Firebase.</div>
   </main>
 
   <script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-app.js";
-  import { 
-    getAuth, 
-    GoogleAuthProvider, 
-    signInWithPopup, 
-    onAuthStateChanged, 
-    signOut 
-  } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-auth.js";
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-app.js";
+    import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-auth.js";
 
-  const firebaseConfig = {
-    apiKey: "AIzaSyDj9relnAX5se46pRmzZpBYE2c-Phndtvs",
-    authDomain: "login-sepawards.firebaseapp.com",
-    projectId: "login-sepawards",
-    storageBucket: "login-sepawards.appspot.com",  // <- corregido
-    messagingSenderId: "224966270314",
-    appId: "1:224966270314:web:2201fb1d8c4791621ad913"
-  };
+    const firebaseConfig = {
+      apiKey: "AIzaSyDj9relnAX5se46pRmzZpBYE2c-Phndtvs",
+      authDomain: "login-sepawards.firebaseapp.com",
+      projectId: "login-sepawards",
+      storageBucket: "login-sepawards.firebasestorage.app",
+      messagingSenderId: "224966270314",
+      appId: "1:224966270314:web:2201fb1d8c4791621ad913"
+    };
 
-  // Inicializar Firebase
-  const app = initializeApp(firebaseConfig);
-  const auth = getAuth(app);
-  const provider = new GoogleAuthProvider();
+    // Inicializar Firebase y Auth
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const provider = new GoogleAuthProvider();
 
-  const btnGoogle = document.getElementById('btnGoogle');
-  const btnLogout = document.getElementById('btnLogout');
-  const profile = document.getElementById('profile');
-  const userName = document.getElementById('userName');
-  const userPic = document.getElementById('userPic');
+    // Elementos
+    const btnGoogle = document.getElementById('btnGoogle');
+    const btnLogout = document.getElementById('btnLogout');
+    const profile = document.getElementById('profile');
+    const userName = document.getElementById('userName');
+    const userPic = document.getElementById('userPic');
 
-  // Iniciar sesión con Google
-  btnGoogle.addEventListener('click', async () => {
-    try {
-      console.log("Intentando login con Google...");
-      await signInWithPopup(auth, provider);
-    } catch (err) {
-      console.error('Error en el login:', err);
-      alert('Error: ' + err.message);
-    }
-  });
+    // Click handler (con logs para debug)
+    btnGoogle.addEventListener('click', async () => {
+      console.log('btnGoogle clicked');
+      try {
+        await signInWithPopup(auth, provider);
+        console.log('signInWithPopup llamado OK');
+      } catch (err) {
+        console.error('Error en el login:', err);
+        // Mensajes más útiles al usuario
+        if (err.code === 'auth/popup-closed-by-user' || err.code === 'auth/cancelled-popup-request') {
+          alert('La ventana emergente fue cerrada. Intenta de nuevo.');
+        } else if (err.code === 'auth/operation-not-allowed') {
+          alert('El proveedor Google no está habilitado en Firebase Auth.');
+        } else if (err.code === 'auth/invalid-domain') {
+          alert('Dominio no autorizado en Firebase Auth. Añádelo en la consola de Firebase.');
+        } else {
+          alert('Error: ' + (err.message || err.code));
+        }
+      }
+    });
 
-  // Cerrar sesión
-  btnLogout.addEventListener('click', async () => {
-    try {
-      await signOut(auth);
-      console.log("Sesión cerrada.");
-    } catch (err) {
-      console.error("Error al cerrar sesión:", err);
-    }
-  });
+    // Logout con manejo de error
+    btnLogout.addEventListener('click', async () => {
+      console.log('btnLogout clicked');
+      try {
+        await signOut(auth);
+        console.log('Usuario deslogeado');
+      } catch (err) {
+        console.error('Error cerrando sesión:', err);
+        alert('Error cerrando sesión: ' + (err.message || err.code));
+      }
+    });
 
-  // Detectar cambios de estado (login / logout)
-  onAuthStateChanged(auth, user => {
-    if (user) {
-      console.log("Usuario autenticado:", user);
-      btnGoogle.style.display = 'none';
-      profile.style.display = 'block';
-      userName.textContent = user.displayName || user.email;
-      userPic.src = user.photoURL || '';
-    } else {
-      console.log("No hay usuario logueado.");
-      btnGoogle.style.display = 'inline-flex';
-      profile.style.display = 'none';
-    }
-  });
-</script>
+    // Detectar estado de auth y mostrar UI
+    onAuthStateChanged(auth, user => {
+      if (user) {
+        console.log('Usuario activo:', user);
+        btnGoogle.style.display = 'none';
+        profile.style.display = 'block';
+        userName.textContent = user.displayName || user.email;
+        userPic.src = user.photoURL || '';
+        userPic.alt = `Foto de ${user.displayName || user.email}`;
+      } else {
+        console.log('No hay usuario activo');
+        btnGoogle.style.display = 'inline-flex';
+        profile.style.display = 'none';
+        userPic.src = '';
+      }
+    });
+  </script>
 </body>
-</hNeon
+</html>
