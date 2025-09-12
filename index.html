@@ -120,52 +120,70 @@
   </main>
 
   <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-app.js";
-    import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-auth.js";
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-app.js";
+  import { 
+    getAuth, 
+    GoogleAuthProvider, 
+    signInWithPopup, 
+    onAuthStateChanged, 
+    signOut 
+  } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-auth.js";
 
-    const firebaseConfig = {
-      apiKey: "AIzaSyDj9relnAX5se46pRmzZpBYE2c-Phndtvs",
-      authDomain: "login-sepawards.firebaseapp.com",
-      projectId: "login-sepawards",
-      storageBucket: "login-sepawards.firebasestorage.app",
-      messagingSenderId: "224966270314",
-      appId: "1:224966270314:web:2201fb1d8c4791621ad913"
-    };
+  const firebaseConfig = {
+    apiKey: "AIzaSyDj9relnAX5se46pRmzZpBYE2c-Phndtvs",
+    authDomain: "login-sepawards.firebaseapp.com",
+    projectId: "login-sepawards",
+    storageBucket: "login-sepawards.appspot.com",  // <- corregido
+    messagingSenderId: "224966270314",
+    appId: "1:224966270314:web:2201fb1d8c4791621ad913"
+  };
 
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const provider = new GoogleAuthProvider();
+  // Inicializar Firebase
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const provider = new GoogleAuthProvider();
 
-    const btnGoogle = document.getElementById('btnGoogle');
-    const btnLogout = document.getElementById('btnLogout');
-    const profile = document.getElementById('profile');
-    const userName = document.getElementById('userName');
-    const userPic = document.getElementById('userPic');
+  const btnGoogle = document.getElementById('btnGoogle');
+  const btnLogout = document.getElementById('btnLogout');
+  const profile = document.getElementById('profile');
+  const userName = document.getElementById('userName');
+  const userPic = document.getElementById('userPic');
 
-    btnGoogle.addEventListener('click', async () => {
-      try {
-        await signInWithPopup(auth, provider);
-      } catch (err) {
-        console.error('Error en el login:', err);
-        alert('Error: ' + err.message);
-      }
-    });
+  // Iniciar sesión con Google
+  btnGoogle.addEventListener('click', async () => {
+    try {
+      console.log("Intentando login con Google...");
+      await signInWithPopup(auth, provider);
+    } catch (err) {
+      console.error('Error en el login:', err);
+      alert('Error: ' + err.message);
+    }
+  });
 
-    btnLogout.addEventListener('click', async () => {
+  // Cerrar sesión
+  btnLogout.addEventListener('click', async () => {
+    try {
       await signOut(auth);
-    });
+      console.log("Sesión cerrada.");
+    } catch (err) {
+      console.error("Error al cerrar sesión:", err);
+    }
+  });
 
-    onAuthStateChanged(auth, user => {
-      if (user) {
-        btnGoogle.style.display = 'none';
-        profile.style.display = 'block';
-        userName.textContent = user.displayName || user.email;
-        userPic.src = user.photoURL || '';
-      } else {
-        btnGoogle.style.display = 'inline-flex';
-        profile.style.display = 'none';
-      }
-    });
-  </script>
+  // Detectar cambios de estado (login / logout)
+  onAuthStateChanged(auth, user => {
+    if (user) {
+      console.log("Usuario autenticado:", user);
+      btnGoogle.style.display = 'none';
+      profile.style.display = 'block';
+      userName.textContent = user.displayName || user.email;
+      userPic.src = user.photoURL || '';
+    } else {
+      console.log("No hay usuario logueado.");
+      btnGoogle.style.display = 'inline-flex';
+      profile.style.display = 'none';
+    }
+  });
+</script>
 </body>
 </hNeon
