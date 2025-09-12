@@ -1,140 +1,181 @@
-<!DOCTYPE html>
+<!doctype html>
+
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>GameZone - Diversión sin límites</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>MCA Neon - Login con Google</title>
   <style>
-    /* Fuentes y colores */
-    @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
-    body {
-      font-family: 'Roboto', sans-serif;
-      margin: 0;
-      padding: 0;
-      background: linear-gradient(135deg, #1e3c72, #2a5298);
-      color: #fff;
-      display: flex;
-      flex-direction: column;
-      min-height: 100vh;
-    }
+    /* Reset */
+    *{box-sizing:border-box;margin:0;padding:0}
+    html,body{height:100%}/* Fondo y estética neon amarillo/naranja (inspirado en MCA) */
+body{
+  font-family: Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
+  background: radial-gradient(circle at 10% 10%, #2a0f00 0%, #090606 30%, #020202 100%);
+  color:#fff;
+  min-height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:2rem;
+}
 
-    header {
-      text-align: center;
-      padding: 2rem;
-      background-color: rgba(0,0,0,0.5);
-    }
+.card{
+  width:100%;
+  max-width:720px;
+  padding:48px;
+  border-radius:20px;
+  background: linear-gradient(180deg, rgba(255,188,60,0.06), rgba(255,120,0,0.03));
+  box-shadow: 0 10px 40px rgba(255,160,40,0.06), 0 0 40px rgba(255,160,40,0.07) inset;
+  text-align:center;
+  border: 1px solid rgba(255,150,30,0.12);
+  position:relative;
+  overflow:hidden;
+}
 
-    header h1 {
-      margin: 0;
-      font-size: 3rem;
-      letter-spacing: 2px;
-      color: #ffdd57;
-    }
+/* Neon glow decorative stripes */
+.card::before, .card::after{
+  content:'';
+  position:absolute;
+  width:400px;height:400px;
+  filter:blur(40px);
+  opacity:0.22;
+  transform:rotate(25deg);
+}
+.card::before{background:radial-gradient(circle, #ffd86b 0%, transparent 40%);left:-120px;top:-100px}
+.card::after{background:radial-gradient(circle, #ff7a00 0%, transparent 40%);right:-120px;bottom:-120px}
 
-    header p {
-      font-size: 1.2rem;
-      color: #fff;
-    }
+h1{
+  font-size:2.25rem;
+  letter-spacing:-0.02em;
+  margin-bottom:8px;
+  color:#fffcef;
+  text-shadow: 0 2px 8px rgba(255,160,40,0.18), 0 0 18px rgba(255,200,80,0.12);
+}
+p.lead{
+  color: #fff7e6;
+  margin-bottom:28px;
+  opacity:0.95;
+}
 
-    main {
-      flex: 1;
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-      gap: 1.5rem;
-      padding: 2rem;
-    }
+/* Boton estilo Google con glow */
+.btn-google{
+  display:inline-flex;
+  align-items:center;
+  gap:12px;
+  padding:12px 18px;
+  border-radius:12px;
+  background:linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01));
+  border:1px solid rgba(255,160,40,0.12);
+  cursor:pointer;
+  font-weight:600;
+  color:#0b0b0b;
+  box-shadow: 0 6px 18px rgba(255,140,30,0.12), 0 0 40px rgba(255,140,30,0.06) inset;
+  transition:transform .12s ease, box-shadow .12s ease;
+}
+.btn-google:active{transform:translateY(1px)}
+.btn-google:hover{box-shadow: 0 10px 30px rgba(255,140,30,0.18), 0 0 60px rgba(255,140,30,0.08) inset}
 
-    .game-card {
-      background: rgba(255, 255, 255, 0.1);
-      border-radius: 15px;
-      overflow: hidden;
-      text-align: center;
-      transition: transform 0.3s, box-shadow 0.3s;
-      cursor: pointer;
-    }
+.google-logo{
+  width:20px;height:20px;display:inline-block;
+  background:transparent;flex-shrink:0
+}
 
-    .game-card:hover {
-      transform: translateY(-10px);
-      box-shadow: 0 15px 30px rgba(0,0,0,0.5);
-    }
+/* small footer */
+.small{
+  margin-top:18px;color:rgba(255,255,255,0.65);font-size:.9rem
+}
 
-    .game-card img {
-      width: 100%;
-      height: 150px;
-      object-fit: cover;
-    }
+/* Responsive tweaks */
+@media (max-width:520px){
+  .card{padding:28px;border-radius:16px}
+  h1{font-size:1.5rem}
+}
 
-    .game-card h2 {
-      margin: 1rem 0 0.5rem 0;
-      font-size: 1.5rem;
-      color: #ffdd57;
-    }
-
-    .game-card p {
-      margin: 0 1rem 1rem 1rem;
-      font-size: 1rem;
-    }
-
-    footer {
-      text-align: center;
-      padding: 1rem;
-      background-color: rgba(0,0,0,0.5);
-      font-size: 0.9rem;
-    }
-
-    /* Botón flotante para un toque divertido */
-    .float-button {
-      position: fixed;
-      bottom: 20px;
-      right: 20px;
-      background-color: #ffdd57;
-      color: #1e3c72;
-      border: none;
-      padding: 1rem 1.5rem;
-      border-radius: 50px;
-      font-weight: bold;
-      cursor: pointer;
-      box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-      transition: transform 0.2s;
-    }
-
-    .float-button:hover {
-      transform: scale(1.1);
-    }
   </style>
 </head>
 <body>
+  <main class="card" role="main">
+    <h1>Bienvenido a MCA Neon</h1>
+    <p class="lead">Hola! Encantado de verte. Inicia sesión con tu cuenta de Google para continuar.</p><button id="btnGoogle" class="btn-google" aria-label="Iniciar sesión con Google">
+  <span class="google-logo" aria-hidden="true">
+    <!-- Inline SVG del logo de Google (pequeño) -->
+    <svg width="20" height="20" viewBox="0 0 256 262" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid">
+      <path d="M255.7 133.4c0-8.7-.8-17-2.4-25.1H130v47.6h71.2c-3 17.2-12.6 31.8-26.8 41.6v34h43.3c25.3-23.3 40-57.7 40-98.1z" fill="#4285F4"/>
+      <path d="M130 261c35 0 64.3-11.6 85.7-31.5l-43.3-34c-11.9 8-27.2 12.8-42.4 12.8-32.6 0-60.2-22-70.1-51.5H15.7v32.3C37 227.2 80.8 261 130 261z" fill="#34A853"/>
+      <path d="M59.9 156.8c-4.9-14.6-4.9-30.6 0-45.2V79.3H15.7c-17.6 34.9-17.6 76.1 0 111l44.2-33.5z" fill="#FBBC05"/>
+      <path d="M130 51.1c18.9 0 36 6.5 49.5 19.3l37.1-37.1C195.9 12.4 166.6 0 130 0 80.8 0 37 33.8 15.7 79.3l44.2 32.3C69.8 73.1 97.4 51.1 130 51.1z" fill="#EA4335"/>
+    </svg>
+  </span>
+  Iniciar sesión con Google
+</button>
 
-  <header>
-    <h1>GameZone</h1>
-    <p>Explora y juega tus juegos favoritos directamente desde tu navegador!</p>
-  </header>
+<div class="small">Asegúrate de autorizar el dominio en Firebase si la ventana de inicio de sesión se cierra automáticamente.</div>
 
-  <main>
-    <div class="game-card">
-      <img src="https://placekitten.com/400/200" alt="Juego 1">
-      <h2>Juego 1</h2>
-      <p>Un juego divertido y adictivo para pasar el tiempo.</p>
-    </div>
+  </main>  <!-- Código JS: usa módulos de Firebase v12 -->  <script type="module">
+    // Importar las piezas necesarias de Firebase
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-app.js";
+    import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-auth.js";
 
-    <div class="game-card">
-      <img src="https://placekitten.com/401/200" alt="Juego 2">
-      <h2>Juego 2</h2>
-      <p>Desafía tus habilidades y diviértete sin parar.</p>
-    </div>
+    // Tu configuración proporcionada (ya añadida por ti). Si quieres reemplazarla, hazlo aquí.
+    const firebaseConfig = {
+      apiKey: "AIzaSyDj9relnAX5se46pRmzZpBYE2c-Phndtvs",
+      authDomain: "login-sepawards.firebaseapp.com",
+      databaseURL: "https://login-sepawards-default-rtdb.firebaseio.com",
+      projectId: "login-sepawards",
+      storageBucket: "login-sepawards.firebasestorage.app",
+      messagingSenderId: "224966270314",
+      appId: "1:224966270314:web:2201fb1d8c4791621ad913"
+    };
 
-    <div class="game-card">
-      <img src="https://placekitten.com/402/200" alt="Juego 3">
-      <h2>Juego 3</h2>
-      <p>Explora mundos increíbles y supera los retos.</p>
-    </div>
-  </main>
+    // Inicializar Firebase
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const provider = new GoogleAuthProvider();
 
-  <button class="float-button">¡Jugar ahora!</button>
+    const btn = document.getElementById('btnGoogle');
 
-  <footer>
-    &copy; 2025 GameZone | Todos los derechos reservados
-  </footer>
+    btn.addEventListener('click', async () => {
+      try {
+        // signInWithPopup abrirá una ventana emergente para iniciar sesión con Google
+        const result = await signInWithPopup(auth, provider);
+        // result.user contiene la info del usuario
+        console.log('Sesión iniciada:', result.user);
+        alert(`Hola ${result.user.displayName || result.user.email}, sesión iniciada!`);
+      } catch (err) {
+        console.error('Error en el inicio de sesión:', err);
+        // Mensaje de ayuda si la ventana se cierra automáticamente
+        if (err.code === 'auth/cancelled-popup-request' || err.code === 'auth/popup-closed-by-user'){
+          alert('La ventana emergente fue cerrada. Intenta de nuevo.');
+        } else if (err.code === 'auth/operation-not-allowed'){
+          alert('El proveedor de Google no está habilitado en Firebase Auth. Actívalo en la consola de Firebase.');
+        } else if (err.code === 'auth/invalid-domain'){
+          alert('Dominio no autorizado en Firebase Auth. Ve a la consola > Authentication > Sign-in method > Authorized domains.');
+        } else {
+          alert('Error: ' + (err.message || err.code));
+        }
+      }
+    });
 
-</body>
+    // Opcional: detectar cambios de estado de autenticación
+    onAuthStateChanged(auth, user => {
+      if (user) {
+        console.log('Usuario activo:', user);
+      } else {
+        console.log('No hay usuario activo');
+      }
+    });
+
+    // Para cerrar sesión desde la consola (ejemplo)
+    // await signOut(auth);
+
+    /*
+      NOTAS IMPORTANTES:
+      - En la consola de Firebase debes: Authentication > Sign-in method > habilitar Google.
+      - En la consola de Firebase también debes añadir el dominio donde hospedes esta página en "Authorized domains".
+        Si estás probando en localhost, añade "localhost". Si la ventana de inicio de sesión se abre y se cierra
+        inmediatamente, normalmente es porque el dominio no fue autorizado.
+      - Si quieres usar redirect en lugar de popup (para mobile o ciertos navegadores), reemplaza signInWithPopup por signInWithRedirect.
+    */
+  </script></body>
 </html>
