@@ -119,10 +119,36 @@
       margin-top:18px;color:rgba(255,255,255,0.65);font-size:.9rem
     }
 
-    @media (max-width:520px){
-      .card{padding:28px;border-radius:16px}
-      h1{font-size:1.5rem}
+    /* Estilos para premios */
+    #votingSection {
+      display:none;
+      margin-top:30px;
+      text-align:left;
     }
+    #votingSection h2 {
+      margin-bottom:16px;
+      color:#ffd86b;
+    }
+    .award {
+      margin-bottom:20px;
+      padding:12px;
+      border:1px solid rgba(255,255,255,0.15);
+      border-radius:10px;
+      background:rgba(255,255,255,0.03);
+    }
+    .award h3 { margin-bottom:8px }
+    .award button {
+      margin-top:8px;
+      padding:8px 14px;
+      border:none;
+      border-radius:8px;
+      cursor:pointer;
+      background:#ff7a00;
+      color:#fff;
+      font-weight:600;
+      transition:background .2s;
+    }
+    .award button:hover { background:#ff9500 }
   </style>
 </head>
 <body>
@@ -137,7 +163,8 @@
 
     <button id="btnGoogle" class="btn-google" type="button" aria-label="Iniciar sesión con Google">
       <span class="google-logo" aria-hidden="true">
-        <svg width="20" height="20" viewBox="0 0 256 262" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid">
+        <!-- Google logo -->
+        <svg width="20" height="20" viewBox="0 0 256 262">
           <path d="M255.7 133.4c0-8.7-.8-17-2.4-25.1H130v47.6h71.2c-3 17.2-12.6 31.8-26.8 41.6v34h43.3c25.3-23.3 40-57.7 40-98.1z" fill="#4285F4"/>
           <path d="M130 261c35 0 64.3-11.6 85.7-31.5l-43.3-34c-11.9 8-27.2 12.8-42.4 12.8-32.6 0-60.2-22-70.1-51.5H15.7v32.3C37 227.2 80.8 261 130 261z" fill="#34A853"/>
           <path d="M59.9 156.8c-4.9-14.6-4.9-30.6 0-45.2V79.3H15.7c-17.6 34.9-17.6 76.1 0 111l44.2-33.5z" fill="#FBBC05"/>
@@ -150,6 +177,22 @@
     <div class="profile" id="profile" style="display:none;">
       <img id="userPic" alt="Foto de perfil">
       <p id="userName"></p>
+      <h2 id="startVoting" style="display:none; margin-top:20px;">🎉 Empieza a votar!</h2>
+      <div id="votingSection">
+        <h2>Premios</h2>
+        <div class="award">
+          <h3>Mejor Jugador</h3>
+          <button>Votar</button>
+        </div>
+        <div class="award">
+          <h3>Mejor Construcción</h3>
+          <button>Votar</button>
+        </div>
+        <div class="award">
+          <h3>Jugador más activo</h3>
+          <button>Votar</button>
+        </div>
+      </div>
       <button class="btn-logout" id="btnLogout" type="button">Cerrar sesión</button>
     </div>
   </main>
@@ -178,6 +221,8 @@
     const userPic = document.getElementById('userPic');
     const profileCorner = document.getElementById('profileCorner');
     const cornerPic = document.getElementById('cornerPic');
+    const startVoting = document.getElementById('startVoting');
+    const votingSection = document.getElementById('votingSection');
 
     btnGoogle.addEventListener('click', async () => {
       try {
@@ -205,16 +250,19 @@
         userPic.src = user.photoURL || '';
         userPic.alt = `Foto de ${user.displayName || user.email}`;
 
-        // Mostrar icono en esquina
         cornerPic.src = user.photoURL || '';
         cornerPic.alt = `Foto de ${user.displayName || user.email}`;
         profileCorner.style.display = 'block';
 
-        // Redirigir a votar
-        window.location.href = 'votar.html'; // Cambia la ruta si es distinta
+        // Mostrar mensaje y premios
+        startVoting.style.display = 'block';
+        votingSection.style.display = 'block';
+
       } else {
         btnGoogle.style.display = 'inline-flex';
         profile.style.display = 'none';
+        startVoting.style.display = 'none';
+        votingSection.style.display = 'none';
         userPic.src = '';
         profileCorner.style.display = 'none';
       }
