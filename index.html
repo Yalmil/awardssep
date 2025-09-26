@@ -62,7 +62,7 @@
       opacity:0.95;
     }
 
-    .btn-google, .btn-logout{
+    .btn-google{
       display:inline-flex;
       align-items:center;
       gap:12px;
@@ -78,85 +78,15 @@
       margin-top:12px;
       user-select: none;
     }
-    .btn-google:active,.btn-logout:active{transform:translateY(1px)}
-    .btn-google:hover,.btn-logout:hover{box-shadow: 0 10px 30px rgba(255,140,30,0.18), 0 0 60px rgba(255,140,30,0.08) inset}
+    .btn-google:active{transform:translateY(1px)}
+    .btn-google:hover{box-shadow: 0 10px 30px rgba(255,140,30,0.18), 0 0 60px rgba(255,140,30,0.08) inset}
 
     .google-logo{
       width:20px;height:20px;display:inline-block;flex-shrink:0
     }
-
-    .profile{
-      display:flex;
-      flex-direction:column;
-      align-items:center;
-      margin-top:20px;
-    }
-    .profile img{
-      width:64px;height:64px;border-radius:50%;
-      box-shadow: 0 0 12px rgba(255,160,40,0.6);
-    }
-
-    .profile-corner{
-      position:fixed;
-      top:12px;
-      right:12px;
-      width:48px;
-      height:48px;
-      border-radius:50%;
-      overflow:hidden;
-      box-shadow: 0 0 12px rgba(255,160,40,0.6);
-      cursor:pointer;
-      display:none;
-      z-index:10;
-    }
-    .profile-corner img{
-      width:100%;
-      height:100%;
-      object-fit:cover;
-    }
-
-    .small{
-      margin-top:18px;color:rgba(255,255,255,0.65);font-size:.9rem
-    }
-
-    /* Estilos para premios */
-    #votingSection {
-      display:none;
-      margin-top:30px;
-      text-align:left;
-    }
-    #votingSection h2 {
-      margin-bottom:16px;
-      color:#ffd86b;
-    }
-    .award {
-      margin-bottom:20px;
-      padding:12px;
-      border:1px solid rgba(255,255,255,0.15);
-      border-radius:10px;
-      background:rgba(255,255,255,0.03);
-    }
-    .award h3 { margin-bottom:8px }
-    .award button {
-      margin-top:8px;
-      padding:8px 14px;
-      border:none;
-      border-radius:8px;
-      cursor:pointer;
-      background:#ff7a00;
-      color:#fff;
-      font-weight:600;
-      transition:background .2s;
-    }
-    .award button:hover { background:#ff9500 }
   </style>
 </head>
 <body>
-  <!-- Icono de perfil en esquina -->
-  <div class="profile-corner" id="profileCorner">
-    <img id="cornerPic" alt="Perfil">
-  </div>
-
   <main class="card" role="main">
     <h1>Bienvenido a MSA</h1>
     <p class="lead">Inicia sesión con tu cuenta de Google para continuar.</p>
@@ -173,33 +103,11 @@
       </span>
       Iniciar sesión con Google
     </button>
-
-    <div class="profile" id="profile" style="display:none;">
-      <img id="userPic" alt="Foto de perfil">
-      <p id="userName"></p>
-      <h2 id="startVoting" style="display:none; margin-top:20px;">🎉 Empieza a votar!</h2>
-      <div id="votingSection">
-        <h2>Premios</h2>
-        <div class="award">
-          <h3>Mejor Jugador</h3>
-          <button>Votar</button>
-        </div>
-        <div class="award">
-          <h3>Mejor Construcción</h3>
-          <button>Votar</button>
-        </div>
-        <div class="award">
-          <h3>Jugador más activo</h3>
-          <button>Votar</button>
-        </div>
-      </div>
-      <button class="btn-logout" id="btnLogout" type="button">Cerrar sesión</button>
-    </div>
   </main>
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-app.js";
-    import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-auth.js";
+    import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-auth.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyDj9relnAX5se46pRmzZpBYE2c-Phndtvs",
@@ -215,56 +123,22 @@
     const provider = new GoogleAuthProvider();
 
     const btnGoogle = document.getElementById('btnGoogle');
-    const btnLogout = document.getElementById('btnLogout');
-    const profile = document.getElementById('profile');
-    const userName = document.getElementById('userName');
-    const userPic = document.getElementById('userPic');
-    const profileCorner = document.getElementById('profileCorner');
-    const cornerPic = document.getElementById('cornerPic');
-    const startVoting = document.getElementById('startVoting');
-    const votingSection = document.getElementById('votingSection');
 
     btnGoogle.addEventListener('click', async () => {
       try {
         await signInWithPopup(auth, provider);
+        // Redirección automática al iniciar sesión
+        window.location.href = "votar.html";
       } catch (err) {
         console.error('Error en el login:', err);
         alert('Error: ' + (err.message || err.code));
       }
     });
 
-    btnLogout.addEventListener('click', async () => {
-      try {
-        await signOut(auth);
-      } catch (err) {
-        console.error('Error cerrando sesión:', err);
-        alert('Error cerrando sesión: ' + (err.message || err.code));
-      }
-    });
-
     onAuthStateChanged(auth, user => {
       if (user) {
-        btnGoogle.style.display = 'none';
-        profile.style.display = 'block';
-        userName.textContent = user.displayName || user.email;
-        userPic.src = user.photoURL || '';
-        userPic.alt = `Foto de ${user.displayName || user.email}`;
-
-        cornerPic.src = user.photoURL || '';
-        cornerPic.alt = `Foto de ${user.displayName || user.email}`;
-        profileCorner.style.display = 'block';
-
-        // Mostrar mensaje y premios
-        startVoting.style.display = 'block';
-        votingSection.style.display = 'block';
-
-      } else {
-        btnGoogle.style.display = 'inline-flex';
-        profile.style.display = 'none';
-        startVoting.style.display = 'none';
-        votingSection.style.display = 'none';
-        userPic.src = '';
-        profileCorner.style.display = 'none';
+        // Si ya está logueado, también lo manda a votar.html
+        window.location.href = "votar.html";
       }
     });
   </script>
