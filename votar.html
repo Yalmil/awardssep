@@ -36,7 +36,7 @@
       padding: 10px;
       border-radius: 12px;
       text-align: center;
-      transition: transform 0.15s ease;
+      transition: transform 0.15s ease, opacity 0.3s;
       cursor: pointer;
     }
     .nominado:hover {
@@ -51,14 +51,20 @@
       border-radius: 8px;
       margin-bottom: 8px;
     }
+    .oscuro {
+      opacity: 0.4;
+    }
+    .seleccionado {
+      border: 2px solid #ffd86b;
+      box-shadow: 0 0 10px #ffd86b;
+      opacity: 1 !important;
+    }
   </style>
 </head>
 <body>
   <h1>Empieza a votar!</h1>
 
   <div class="categoria">
-
-    <!--Hecho-->
     <h2>Mejor Staff</h2>
     <div class="nominados">
       <div class="nominado"><img src="imagenes/ab2607a3082059067c1dc002161ca663.png"><p>Milenial</p></div>
@@ -66,7 +72,7 @@
       <div class="nominado"><img src="imagenes/cc37b2d46919eda3905dad8bf34b28de.png"><p>Lu</p></div>
     </div>
   </div>
-<!--Hecho-->
+
   <div class="categoria">
     <h2>Usuario más activo</h2>
     <div class="nominados">
@@ -77,7 +83,6 @@
     </div>
   </div>
 
-  <!--Hecho-->
   <div class="categoria">
     <h2>Mejor bot</h2>
     <div class="nominados">
@@ -90,8 +95,6 @@
     </div>
   </div>
 
-  <!--Hecho-->
-  
   <div class="categoria">
     <h2>Mejor foto de perfil</h2>
     <div class="nominados">
@@ -102,13 +105,10 @@
     </div>
   </div>
 
-  <!--Hecho-->
   <div class="categoria">
     <h2>Mejor meme</h2>
     <div class="nominados">
-      <div class="nominado"><img src="imagenes/Untitled185_20250906193215.png"><p>
-        <href="https://yalmil.github.io/awardssep/imagenes/Untitled185_20250906193215.png">When estas en cena familiar
-      </p></div>
+      <div class="nominado"><img src="imagenes/Untitled185_20250906193215.png"><p>When estas en cena familiar</p></div>
       <div class="nominado"><img src="imagenes/Screenshot_20250910-1406432.png"><p>Manana</p></div>
       <div class="nominado"><img src="imagenes/Screenshot_20250920-2027302.png"><p>Te voy a meter perma</p></div>
     </div>
@@ -117,9 +117,9 @@
   <div class="categoria">
     <h2>Mejor mundo</h2>
     <div class="nominados">
-      <div class="nominado"><img src="imagenes/Picsart_25-09-16_11-51-24-564.png"><p>New world (ya se que va a ganar este)</p></div>
+      <div class="nominado"><img src="imagenes/Picsart_25-09-16_11-51-24-564.png"><p>New world</p></div>
       <div class="nominado"><img src="imagenes/Picsart_25-09-16_11-51-24-564.png"><p>Skyblock</p></div>
-      <div class="nominado"><img src="imagenes/Picsart_25-09-16_11-51-24-564.png"><p>Servidor de Minecraft (no duró ni 10 minutos)</p></div>
+      <div class="nominado"><img src="imagenes/Picsart_25-09-16_11-51-24-564.png"><p>Servidor de Minecraft</p></div>
     </div>
   </div>
 
@@ -134,5 +134,49 @@
     </div>
   </div>
 
+  <!-- Firebase -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-app.js";
+    import { getDatabase, ref, set } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-database.js";
+
+    // Configuración Firebase
+    const firebaseConfig = {
+      apiKey: "AIzaSyDj9relnAX5se46pRmzZpBYE2c-Phndtvs",
+      authDomain: "login-sepawards.firebaseapp.com",
+      databaseURL: "https://login-sepawards-default-rtdb.firebaseio.com",
+      projectId: "login-sepawards",
+      storageBucket: "login-sepawards.firebasestorage.app",
+      messagingSenderId: "224966270314",
+      appId: "1:224966270314:web:2201fb1d8c4791621ad913"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+
+    // Manejo de selección
+    document.querySelectorAll('.categoria').forEach(categoria => {
+      const nominados = categoria.querySelectorAll('.nominado');
+      nominados.forEach(nominado => {
+        nominado.addEventListener('click', () => {
+          // oscurecer todos
+          nominados.forEach(n => {
+            n.classList.add('oscuro');
+            n.classList.remove('seleccionado');
+          });
+          // resaltar seleccionado
+          nominado.classList.add('seleccionado');
+          nominado.classList.remove('oscuro');
+
+          // Guardar voto
+          const categoriaNombre = categoria.querySelector('h2').innerText;
+          const nominadoNombre = nominado.querySelector('p').innerText;
+          set(ref(db, 'votos/' + categoriaNombre), {
+            elegido: nominadoNombre,
+            timestamp: Date.now()
+          });
+        });
+      });
+    });
+  </script>
 </body>
-                    </html>
+</html>
