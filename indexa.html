@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <link rel="icon" href="https://cdn.discordapp.com/icons/1323414194019762227/97b0dda854236329a50854aef689f8b3.png?size=2048" type="image/png">
+  <title>MSA - Minecraft Sep Award</title>
+  <!-- Open Graph / Discord Embed -->
+  <meta property="og:title" content="SEP AWARDS">
+  <meta property="og:description" content="Listo para votar en todas las nuevas categorías y apoyar a tus favoritos del servidor?">
+  <meta property="og:image" content="https://cdn.discordapp.com/icons/1323414194019762227/97b0dda854236329a50854aef689f8b3.png?size=2048">
+  <meta property="og:url" content="https://yalmil.github.io/awardssep/">
+  <meta property="og:type" content="website">
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    html,body{height:100%}
+
+    body{
+      font-family: Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
+      background: radial-gradient(circle at 10% 10%, #2a0f00 0%, #090606 30%, #020202 100%);
+      color:#fff;
+      min-height:100vh;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:2rem;
+      position:relative;
+    }
+
+    .card{
+      width:100%;
+      max-width:720px;
+      padding:48px;
+      border-radius:20px;
+      background: linear-gradient(180deg, rgba(255,188,60,0.06), rgba(255,120,0,0.03));
+      box-shadow: 0 10px 40px rgba(255,160,40,0.06), 0 0 40px rgba(255,160,40,0.07) inset;
+      text-align:center;
+      border: 1px solid rgba(255,150,30,0.12);
+      position:relative;
+      overflow:hidden;
+      z-index:1;
+    }
+
+    .card::before, .card::after{
+      content:'';
+      position:absolute;
+      width:400px;height:400px;
+      filter:blur(40px);
+      opacity:0.22;
+      transform:rotate(25deg);
+      pointer-events: none;
+      z-index:0;
+    }
+    .card::before{background:radial-gradient(circle, #ffd86b 0%, transparent 40%);left:-120px;top:-100px}
+    .card::after{background:radial-gradient(circle, #ff7a00 0%, transparent 40%);right:-120px;bottom:-120px}
+
+    .card > * { position: relative; z-index: 2; }
+
+    h1{
+      font-size:2.25rem;
+      margin-bottom:8px;
+      color:#fffcef;
+      text-shadow: 0 2px 8px rgba(255,160,40,0.18), 0 0 18px rgba(255,200,80,0.12);
+    }
+    p.lead{
+      color: #fff7e6;
+      margin-bottom:28px;
+      opacity:0.95;
+    }
+
+    .btn-google{
+      display:inline-flex;
+      align-items:center;
+      gap:12px;
+      padding:12px 18px;
+      border-radius:12px;
+      background:linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01));
+      border:1px solid rgba(255,160,40,0.12);
+      cursor:pointer;
+      font-weight:600;
+      color:#0b0b0b;
+      box-shadow: 0 6px 18px rgba(255,140,30,0.12), 0 0 40px rgba(255,140,30,0.06) inset;
+      transition:transform .12s ease, box-shadow .12s ease;
+      margin-top:12px;
+      user-select: none;
+    }
+    .btn-google:active{transform:translateY(1px)}
+    .btn-google:hover{box-shadow: 0 10px 30px rgba(255,140,30,0.18), 0 0 60px rgba(255,140,30,0.08) inset}
+
+    .google-logo{
+      width:20px;height:20px;display:inline-block;flex-shrink:0
+    }
+  </style>
+</head>
+<body>
+  <main class="card" role="main">
+    <h1>Bienvenido a MSA</h1>
+    <p class="lead">Gracias a todos por votar! puedes ver los resultados dando click al siguiente botón</p>
+
+    <button id="btnGoogle" class="btn-google" type="button" aria-label="Ver resultados">
+      <span class="google-logo" aria-hidden="true"></span>
+      Ver resultados
+    </button>
+  </main>
+
+  <script>
+    const btnGoogle = document.getElementById('btnGoogle');
+    btnGoogle.addEventListener('click', () => {
+      window.location.href = "resultados.html";
+    });
+  </script>
+</body>
+</html>
