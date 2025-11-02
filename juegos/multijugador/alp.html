@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Yalmil.com - Adivina la palabra</title>
+
+  <link rel="icon" href="https://cdn.discordapp.com/emojis/1416607460201857168.png?v=1" type="image/png">
+  <meta property="og:title" content="Yalmil.com" />
+  <meta property="og:description" content="Te unes o mañana duermes para siempre..." />
+  <meta property="og:image" content="https://cdn.discordapp.com/attachments/1355008732576088204/1402309070014124102/Screenshot_20250804-221210.png" />
+  <meta property="og:url" content="https://yalmil.github.io/Yalmil.com/" />
+  <meta property="og:type" content="website" />
+
+  <style>
+    :root { font-family: Inter, system-ui, Arial, sans-serif }
+    body { display:flex; align-items:center; justify-content:center; min-height:100vh; background:#0b1020; color:#e6eef8; padding:20px; overflow:hidden }
+    .card { background:linear-gradient(180deg,#0f1724,#091022); padding:18px; border-radius:12px; box-shadow:0 8px 30px rgba(0,0,0,.6); width:100%; max-width:900px; position:relative }
+    h1 { font-size:20px; margin-bottom:8px }
+    .row { display:flex; gap:8px; margin-bottom:8px }
+    input, button, textarea { padding:8px; border-radius:8px; border:1px solid #1f2a44; background:transparent; color:inherit }
+    button { cursor:pointer }
+    .hidden { display:none }
+    #playersList { max-height:150px; overflow:auto; border:1px dashed #24324f; padding:8px; border-radius:8px }
+    .player { padding:6px; border-radius:6px; background:rgba(255,255,255,0.02); margin-bottom:6px }
+    .meta { font-size:12px; color:#9fb0d6 }
+    .label { font-size:11px; margin-left:6px; padding:2px 6px; border-radius:6px; background:#1e293b; color:#fff }
+    .organizer { background:#2563eb }
+    .creator { background:#22c55e }
+    .winner-popup { position:absolute; top:50%; left:50%; transform:translate(-50%,-50%) scale(0); background:#1f2a44; padding:40px 60px; border-radius:20px; color:#fff; font-size:24px; font-weight:bold; text-align:center; box-shadow:0 0 30px rgba(0,0,0,0.6); transition:transform .5s ease; z-index:10 }
+    .winner-popup.show { transform:translate(-50%,-50%) scale(1) }
+    .guesses-history { max-height:200px; overflow-y:auto; border:1px solid #24324f; padding:8px; border-radius:8px; margin-top:8px; background:rgba(255,255,255,0.02) }
+    .guess-item { padding:6px; margin-bottom:4px; background:rgba(255,255,255,0.05); border-radius:4px; font-size:12px }
+    .guess-item strong { color:#e6eef8 }
+    .guess-item .player-name { color:#9fb0d6 }
+    .min-players-warning { background:#7f1d1d; padding:8px; border-radius:8px; margin-bottom:8px; color:#fca5a5; font-size:12px }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>Sala en espera</h1>
+    <div id="initial">
+      <div class="row">
+        <input id="nameInput" placeholder="Tu nombre" />
+        <button id="createBtn">Crear sala</button>
+        <button id="joinBtn">Unirse a sala</button>
+      </div>
+      <div id="joinArea" class="hidden row">
+        <input id="joinId" placeholder="ID de la sala (hay 100k de salas disponibles)" />
+        <button id="joinConfirm">Unirse</button>
+      </div>
+      <div id="status" class="meta"></div>
+    </div>
+
+    <div id="room" class="hidden">
+      <div class="row">
+        <div>
+          <div class="meta">Sala: <span id="roomIdDisplay"></span></div>
+          <div class="meta">Tu nombre: <span id="yourName"></span></div>
+        </div>
+        <div style="margin-left:auto">
+          <button id="leaveBtn">Salir</button>
+        </div>
+      </div>
+
+      <h3>Jugadores</h3>
+      <div id="playersList"></div>
+      <div id="minPlayersWarning" class="min-players-warning hidden">Se necesitan mínimo 2 jugadores para iniciar la partida</div>
+
+      <div id="controls" class="row" style="margin-top:8px">
+        <button id="startGame" class="hidden">Iniciar partida</button>
+      </div>
+
+      <div id="gameArea" class="hidden">
+        <div id="roleArea"></div>
+      </div>
+
+      <div id="winnerPopup" class="winner-popup">Ganador</div>
+    </div>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js';
+    import { getDatabase, ref, set, push, onValue, get, update, remove } from 'https://www.gstatic.com/firebasejs/9.22.1/firebase-database.js';
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyAZoRcoeC3MFMPYJWgl4dmNjq-U51dKD5o",
+      authDomain: "databaseloginweb.firebaseapp.com",
+      databaseURL: "https://databaseloginweb-default-rtdb.firebaseio.com",
+      projectId: "databaseloginweb",
+      storageBucket: "databaseloginweb.firebasestorage.app",
+      messagingSenderId: "121538864529",
+      appId: "1:121538864529:web:e92aaeaa4ba52618162630"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+    const $ = id => document.getElementById(id);
+
+    const local = { roomId: null, name: null, playerKey: null, isCreator: false, isOrganizer: false };
+
+    const randomId = (len = 6) => Math.random().toString(36).substring(2, 2 + len).toUpperCase();
+
+    // Eliminar jugador cuando se cierra la pestaña
+    window.addEventListener('beforeunload', () => {
+      if (local.roomId && local.playerKey) {
+        const playerRef = ref(db, `rooms/${local.roomId}/players/${local.playerKey}`);
+        remove(playerRef);
+      }
+    });
+
+    window.addEventListener('unload', () => {
+      if (local.roomId && local.playerKey) {
+        const playerRef = ref(db, `rooms/${local.roomId}/players/${local.playerKey}`);
+        remove(playerRef);
+      }
+    });
+
+    $('createBtn').onclick = async () => {
+      const name = $('nameInput').value.trim();
+      if (!name) return $('status').textContent = 'Escribe tu nombre';
+      if (name.toLowerCase() === 'yalmil') {
+        const pass = prompt("Introduce la contraseña:");
+        if (pass !== "Si") return alert("Contraseña incorrecta");
+      }
+      const id = randomId();
+      local.name = name;
+      local.roomId = id;
+      local.isCreator = name.toLowerCase() === 'yalmil';
+      await set(ref(db, `rooms/${id}`), { creatorName: name, organizerKey: null, createdAt: Date.now() });
+      await joinRoom(id);
+    };
+
+    $('joinBtn').onclick = () => $('joinArea').classList.toggle('hidden');
+
+    $('joinConfirm').onclick = () => {
+      const id = $('joinId').value.trim().toUpperCase();
+      if (!id) return $('status').textContent = 'Ingresa un ID';
+      joinRoom(id);
+    };
+
+    async function joinRoom(id) {
+      const name = $('nameInput').value.trim();
+      if (!name) return $('status').textContent = 'Escribe tu nombre';
+      if (name.toLowerCase() === 'yalmil') {
+        const pass = prompt("Introduce la contraseña:");
+        if (pass !== "Si") return alert("Contraseña incorrecta");
+      }
+
+      const roomRef = ref(db, `rooms/${id}`);
+      const snap = await get(roomRef);
+      if (!snap.exists()) return $('status').textContent = 'Sala no encontrada';
+      const playersRef = ref(db, `rooms/${id}/players`);
+      const newPlayer = push(playersRef);
+      await set(newPlayer, { name, joinedAt: Date.now() });
+      local.playerKey = newPlayer.key;
+      local.roomId = id;
+      local.name = name;
+      local.isCreator = name.toLowerCase() === 'yalmil';
+      $('initial').classList.add('hidden');
+      $('room').classList.remove('hidden');
+      $('yourName').textContent = name;
+      $('roomIdDisplay').textContent = id;
+
+      const data = (await get(roomRef)).val();
+      if (!data.organizerKey) {
+        await update(roomRef, { organizerKey: newPlayer.key });
+        local.isOrganizer = true;
+      }
+
+      listenRoom(id);
+    }
+
+    $('leaveBtn').onclick = async () => {
+      if (local.roomId && local.playerKey) {
+        const playerRef = ref(db, `rooms/${local.roomId}/players/${local.playerKey}`);
+        await remove(playerRef);
+        const roomRef = ref(db, `rooms/${local.roomId}`);
+        const roomSnap = await get(roomRef);
+        if (roomSnap.exists()) {
+          const data = roomSnap.val();
+          const players = data.players || {};
+          const playerKeys = Object.keys(players);
+          if (data.organizerKey === local.playerKey && playerKeys.length > 0) {
+            const randomKey = playerKeys[Math.floor(Math.random() * playerKeys.length)];
+            await update(roomRef, { organizerKey: randomKey });
+          }
+          if (playerKeys.length === 0) await remove(roomRef);
+        }
+      }
+      location.reload();
+    };
+
+    function listenRoom(id) {
+      const roomRef = ref(db, `rooms/${id}`);
+      onValue(roomRef, snap => {
+        if (!snap.exists()) return;
+        const data = snap.val();
+        const players = data.players || {};
+        const playerCount = Object.keys(players).length;
+        
+        renderPlayers(players, data.organizerKey);
+        
+        if (playerCount < 2) {
+          $('minPlayersWarning').classList.remove('hidden');
+          $('startGame').classList.add('hidden');
+        } else {
+          $('minPlayersWarning').classList.add('hidden');
+          const isOrganizer = local.playerKey === data.organizerKey;
+          local.isOrganizer = isOrganizer;
+          if ((isOrganizer || local.isCreator) && !data.game) $('startGame').classList.remove('hidden');
+          else if (data.game) $('startGame').classList.add('hidden');
+        }
+      });
+    }
+
+    $('startGame').onclick = async () => {
+      if (!local.isOrganizer && !local.isCreator) return;
+      const roomRef = ref(db, `rooms/${local.roomId}`);
+      const data = (await get(roomRef)).val();
+      const players = Object.keys(data.players || {});
+      if (players.length < 2) return alert('Se necesitan mínimo 2 jugadores');
+      $('startGame').classList.add('hidden');
+      const randomPlayer = players[Math.floor(Math.random() * players.length)];
+      await update(roomRef, { game: { chooser: randomPlayer, state: 'choosing' } });
+    };
+
+    onValue(ref(db, `rooms`), async snap => {
+      const room = snap.val()?.[local.roomId];
+      if (!room) return;
+      const game = room.game;
+      if (!game) {
+        $('gameArea').classList.add('hidden');
+        $('roleArea').innerHTML = '';
+        return;
+      }
+      const roleArea = $('roleArea');
+      $('gameArea').classList.remove('hidden');
+      if (game.state === 'choosing') {
+        if (local.playerKey === game.chooser) {
+          const guesses = Object.values(game.guesses || {});
+          let guessesHTML = '';
+          if (guesses.length > 0) {
+            guessesHTML = '<div class="guesses-history"><strong>Intentos fallidos:</strong><br>';
+            guesses.forEach(g => {
+              guessesHTML += `<div class="guess-item"><span class="player-name">${g.player}:</span> <strong>${g.guess}</strong></div>`;
+            });
+            guessesHTML += '</div>';
+          }
+          
+          roleArea.innerHTML = `<h3>Elige una palabra</h3>
+            ${guessesHTML}
+            <input id="word" placeholder="Palabra" /><br>
+            <input id="p1" placeholder="Pista 1" /><br>
+            <input id="p2" placeholder="Pista 2" /><br>
+            <input id="p3" placeholder="Pista 3" /><br>
+            <button id="sendWord">Listo</button>`;
+          $('sendWord').onclick = async () => {
+            const word = $('word').value.trim().toLowerCase();
+            const hints = [ $('p1').value, $('p2').value, $('p3').value ];
+            if (!word) return alert('Escribe una palabra');
+            await update(ref(db, `rooms/${local.roomId}/game`), { word, hints, guesses: {}, state: 'guessing' });
+          };
+        } else {
+          roleArea.innerHTML = `<h3>Esperando a que el jugador elija una palabra...</h3>`;
+        }
+      } else if (game.state === 'guessing') {
+        if (!game.word) return;
+        
+        // Si el jugador es el que eligió la palabra, muestra el historial
+        if (local.playerKey === game.chooser) {
+          const guesses = Object.values(game.guesses || {});
+          let guessesHTML = '<strong>Intentos:</strong><br>';
+          if (guesses.length > 0) {
+            guesses.forEach(g => {
+              guessesHTML += `<div class="guess-item"><span class="player-name">${g.player}:</span> <strong>${g.guess}</strong></div>`;
+            });
+          } else {
+            guessesHTML += '<div class="guess-item">Sin intentos aún</div>';
+          }
+          roleArea.innerHTML = `<h3>Historial de intentos</h3><div class="guesses-history">${guessesHTML}</div>`;
+        } else {
+          // Los demás jugadores ven la interfaz para adivinar
+          roleArea.innerHTML = `<h3>Adivina la palabra</h3>
+            <input id="guessInput" placeholder="Tu intento" />
+            <button id="guessBtn">Intentar</button>
+            <div id="feedback"></div>`;
+          const guesses = Object.values(game.guesses || {});
+          const attempts = guesses.filter(g => g.player === local.name).length;
+          let hintMsg = '';
+          if (attempts >= 25) hintMsg = 'Perdiste';
+          else if (attempts >= 20) hintMsg = 'Pista 3: ' + game.hints[2];
+          else if (attempts >= 15) hintMsg = 'Pista 2: ' + game.hints[1];
+          else if (attempts >= 10) hintMsg = 'Pista 1: ' + game.hints[0];
+          else if (attempts >= 5) hintMsg = 'Inicial: ' + game.word[0].toUpperCase();
+          if (hintMsg) $('feedback').innerHTML = `<p>${hintMsg}</p>`;
+
+          $('guessBtn').onclick = async () => {
+            const val = $('guessInput').value.trim().toLowerCase();
+            if (!val) return;
+            const correct = val === game.word.toLowerCase();
+            const newGuess = push(ref(db, `rooms/${local.roomId}/game/guesses`));
+            await set(newGuess, { player: local.name, guess: val });
+            if (correct) {
+              showWinner(local.name);
+              await update(ref(db, `rooms/${local.roomId}/game`), null);
+            }
+          };
+        }
+      }
+    });
+
+    function renderPlayers(players, organizerKey) {
+      $('playersList').innerHTML = '';
+      for (const k in players) {
+        const p = players[k];
+        const d = document.createElement('div');
+        d.className = 'player';
+        let label = '';
+        if (k === organizerKey) label = "<span class='label organizer'>Organizador</span>";
+        if (p.name.toLowerCase() === 'yalmil') label = "<span class='label creator'>Creador</span>";
+        d.innerHTML = `<strong>${p.name}</strong> ${label} <div class='meta'>${new Date(p.joinedAt).toLocaleString()}</div>`;
+        $('playersList').appendChild(d);
+      }
+    }
+
+    function showWinner(name) {
+      const popup = $('winnerPopup');
+      popup.textContent = `Ganador: ${name}`;
+      popup.classList.add('show');
+      setTimeout(() => {
+        popup.classList.remove('show');
+        $('gameArea').classList.add('hidden');
+        $('roleArea').innerHTML = '';
+        if (local.isOrganizer || local.isCreator) {
+          $('startGame').classList.remove('hidden');
+        }
+      }, 3000);
+    }
+  </script>
+</body>
+</html>
