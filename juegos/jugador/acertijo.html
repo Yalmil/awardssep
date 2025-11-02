@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Juego de Contraseñas de Letras</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(135deg, #0a0a0a, #1a001f);
+      color: #e5ccff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 2rem 1rem;
+      animation: fadeIn 1s ease-out;
+      text-align: center;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    h1, h2 {
+      color: #c084fc;
+      text-shadow: 0 0 10px #c084fc;
+    }
+
+    p {
+      font-size: 1.2rem;
+      text-shadow: 0 0 5px #c084fc88;
+    }
+
+    .pantalla {
+      display: none;
+      max-width: 600px;
+      width: 100%;
+    }
+
+    .pantalla.activa {
+      display: block;
+    }
+
+    button {
+      background: #b55eff;
+      color: #fff;
+      border: none;
+      padding: 0.8rem 1.6rem;
+      margin: 1rem 0.5rem;
+      font-size: 1rem;
+      border-radius: 12px;
+      cursor: pointer;
+      box-shadow: 0 0 15px #b55eff88;
+      transition: transform 0.1s ease, background 0.3s ease;
+    }
+
+    button:hover {
+      background: #a855f7;
+    }
+
+    button:active {
+      transform: scale(0.96);
+    }
+
+    input {
+      padding: 0.6rem;
+      font-size: 1rem;
+      border-radius: 8px;
+      border: 2px solid #c084fc;
+      background: rgba(40, 0, 60, 0.25);
+      color: #e5ccff;
+      outline: none;
+      box-shadow: 0 0 10px #c084fc44;
+      backdrop-filter: blur(3px);
+      margin-top: 1rem;
+      width: 150px;
+      text-align: center;
+    }
+
+    .nivel {
+      margin: 30px 0;
+      font-size: 1.2rem;
+      color: #d9b8ff;
+      text-shadow: 0 0 8px #c084fc55;
+    }
+
+    .mensaje {
+      margin-top: 20px;
+      font-weight: bold;
+      font-size: 1.1rem;
+      color: #ff85e0;
+      text-shadow: 0 0 5px #ff85e088;
+    }
+
+    @media (max-width: 600px) {
+      h1 {
+        font-size: 2rem;
+      }
+
+      input {
+        width: 100%;
+      }
+
+      button {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div id="inicio" class="pantalla activa">
+    <h1>🧠 Juego de Contraseñas</h1>
+    <p>Descifra las claves de letras ocultas usando pistas como binario, cifrado y lógica.</p>
+    <button onclick="iniciarJuego()">Comenzar</button>
+  </div>
+
+  <div id="nivel" class="pantalla">
+    <h2 id="titulo-nivel">Nivel 1</h2>
+    <div class="nivel" id="pista">Pista aquí...</div>
+    <input id="respuesta" placeholder="Introduce la letra" maxlength="1" />
+    <br />
+    <button onclick="verificarRespuesta()">Enviar</button>
+    <div class="mensaje" id="mensaje"></div>
+  </div>
+
+  <div id="fin" class="pantalla">
+    <h1>🎉 ¡Felicidades!</h1>
+    <p>Has completado todos los niveles</p>
+    <button onclick="reiniciarJuego()">Jugar de nuevo</button>
+  </div>
+
+  <script>
+    const niveles = [
+      { pista: "01000101 en binario. ¿Qué letra es?", respuesta: "E" },
+      { pista: "Letra después de N", respuesta: "O" },
+      { pista: "Cifrado César +1: D => ?", respuesta: "E" },
+      { pista: "Letra que está entre H y J", respuesta: "I" },
+      { pista: "Ñ - 1 (alfabéticamente, sin contar la Ñ)", respuesta: "N" },
+      { pista: "Letra del medio del abecedario", respuesta: "M" },
+      { pista: "Z al revés del alfabeto (posición 1)", respuesta: "A" },
+      { pista: "Cifra: G = J, H = K. Entonces F = ?", respuesta: "I" },
+    ];
+
+    let nivelActual = 0;
+
+    function iniciarJuego() {
+      document.getElementById("inicio").classList.remove("activa");
+      document.getElementById("nivel").classList.add("activa");
+      cargarNivel();
+    }
+
+    function cargarNivel() {
+      const nivel = niveles[nivelActual];
+      document.getElementById("titulo-nivel").textContent = `Nivel ${nivelActual + 1}`;
+      document.getElementById("pista").textContent = nivel.pista;
+      document.getElementById("respuesta").value = "";
+      document.getElementById("mensaje").textContent = "";
+    }
+
+    function verificarRespuesta() {
+      const input = document.getElementById("respuesta").value.toUpperCase();
+      if (input === niveles[nivelActual].respuesta.toUpperCase()) {
+        nivelActual++;
+        if (nivelActual < niveles.length) {
+          cargarNivel();
+        } else {
+          mostrarFinal();
+        }
+      } else {
+        document.getElementById("mensaje").textContent = "❌ Incorrecto. Intenta otra vez.";
+      }
+    }
+
+    function mostrarFinal() {
+      document.getElementById("nivel").classList.remove("activa");
+      document.getElementById("fin").classList.add("activa");
+    }
+
+    function reiniciarJuego() {
+      nivelActual = 0;
+      document.getElementById("fin").classList.remove("activa");
+      document.getElementById("inicio").classList.add("activa");
+    }
+  </script>
+
+</body>
+</html>
