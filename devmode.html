@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Analizador de repositorio — Yalmil</title>
+
+  <link rel="icon" href="https://cdn.discordapp.com/emojis/1416607460201857168.png?v=1" type="image/png">
+  <meta property="og:title" content="Yalmil.com" />
+  <meta property="og:description" content="<aqui pon un texto relacionado al html>" />
+  <meta property="og:image" content="https://cdn.discordapp.com/attachments/1355008732576088204/1402309070014124102/Screenshot_20250804-221210.png?ex=68937197&is=68922017&hm=1fa6f462304b2b8cf8a0875053730f988d725d114fbf2648fcb87ee1b67b6a76&" />
+  <meta property="og:url" content="https://yalmil.github.io/Yalmil.com/" />
+  <meta property="og:type" content="website" />
+
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(135deg, #0a0a0a, #1a001f);
+      color: #e5ccff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      min-height: 100vh;
+      padding: 2rem 1rem;
+      animation: fadeIn 1s ease-out;
+      text-align: center;
+      overflow-x: hidden;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    h1 {
+      margin: 1rem 0 0.5rem;
+      font-size: 2.5rem;
+      color: #c084fc;
+      text-shadow: 0 0 10px #c084fc;
+    }
+
+    p {
+      font-size: 1.2rem;
+      color: #e5ccff;
+      text-shadow: 0 0 6px #c084fc88;
+    }
+
+    .controls {
+      display: flex;
+      gap: .75rem;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin: 1rem 0 1.5rem;
+    }
+
+    .input, button {
+      padding: .6rem .9rem;
+      border-radius: 8px;
+      border: 1px solid rgba(200,180,255,.12);
+      background: rgba(20, 0, 30, 0.6);
+      color: #fff;
+      font-weight: 600;
+      cursor: pointer;
+      outline: none;
+      box-shadow: 0 6px 18px rgba(0,0,0,.4);
+      transition: transform .12s ease, box-shadow .12s ease;
+    }
+
+    .input[type="text"] {
+      min-width: 320px;
+      max-width: 520px;
+      padding: .5rem .75rem;
+      border-radius: 10px;
+      font-weight: 400;
+    }
+
+    .input:focus, button:focus { box-shadow: 0 0 18px #c084fc66; transform: translateY(-2px); }
+
+    .chest-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      margin: 2rem 0;
+      justify-content: center;
+      max-width: 1200px;
+    }
+
+    .file-card {
+      width: calc(100% - 2rem);
+      max-width: 920px;
+      background: linear-gradient(180deg, rgba(30,10,40,.25), rgba(20,0,30,.18));
+      border: 1px solid #3f1a5f22;
+      padding: .75rem;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      box-shadow: 0 8px 30px rgba(0,0,0,.5);
+    }
+
+    .file-left {
+      text-align: left;
+      overflow: hidden;
+    }
+
+    .file-name {
+      font-size: 1rem;
+      font-weight: 600;
+      color: #fff;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      overflow: hidden;
+      max-width: 68vw;
+    }
+
+    .file-path {
+      font-size: .9rem;
+      color: #d6b8ff99;
+      margin-top: .25rem;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      max-width: 68vw;
+    }
+
+    .file-actions {
+      display: flex;
+      gap: .5rem;
+    }
+
+    .small {
+      padding: .45rem .6rem;
+      font-size: .9rem;
+      border-radius: 8px;
+      background: rgba(150,80,255,.12);
+      border: 1px solid #c084fc33;
+    }
+
+    .note { font-size: .95rem; color: #c9b0ffbb; margin-top: .5rem; }
+
+    footer { margin-top: 2rem; color: #cdaeff66; font-size: .9rem; }
+    a { color: #ffd1ff; text-decoration: none; font-weight: 600; }
+    code { background: rgba(255,255,255,.03); padding: .15rem .4rem; border-radius: 6px; }
+
+    @media (min-width: 900px) {
+      .file-card { padding: .9rem 1rem; }
+    }
+  </style>
+</head>
+<body>
+  <h1>Analizador de archivos del repositorio</h1>
+  <p>Selecciona carpeta local o pega la URL de un repo de GitHub para listar archivos y abrirlos con un botón</p>
+
+  <div class="controls">
+    <button id="pickDir" class="input">Seleccionar carpeta local</button>
+
+    <input id="ghInput" class="input" type="text" placeholder="https://github.com/owner/repo (o owner/repo)"/>
+    <button id="ghLoad" class="input">Cargar desde GitHub</button>
+
+    <button id="clear" class="input">Limpiar lista</button>
+  </div>
+
+  <div id="list" class="chest-container"></div>
+
+  <p class="note">Nota: para carpetas locales el navegador solicitara permiso. File System Access API funciona mejor en Chromium. Para GitHub se usa la API pública.</p>
+
+  <footer>
+    Hecho con ❤️ — abre los archivos con "Abrir" (nueva pestaña) o "Descargar".
+  </footer>
+
+  <script>
+    // Helpers
+    const listEl = document.getElementById('list');
+    const pickDirBtn = document.getElementById('pickDir');
+    const ghLoadBtn = document.getElementById('ghLoad');
+    const ghInput = document.getElementById('ghInput');
+    const clearBtn = document.getElementById('clear');
+
+    function clearList() {
+      listEl.innerHTML = '';
+    }
+
+    clearBtn.addEventListener('click', clearList);
+
+    function addFileCard({name, path, openUrl, blobUrl}) {
+      const card = document.createElement('div');
+      card.className = 'file-card';
+
+      const left = document.createElement('div');
+      left.className = 'file-left';
+      const fileName = document.createElement('div');
+      fileName.className = 'file-name';
+      fileName.textContent = name;
+      const filePath = document.createElement('div');
+      filePath.className = 'file-path';
+      filePath.textContent = path;
+
+      left.appendChild(fileName);
+      left.appendChild(filePath);
+
+      const actions = document.createElement('div');
+      actions.className = 'file-actions';
+
+      const openBtn = document.createElement('button');
+      openBtn.className = 'small';
+      openBtn.textContent = 'Abrir';
+      openBtn.addEventListener('click', () => {
+        if (openUrl) window.open(openUrl, '_blank');
+        else if (blobUrl) window.open(blobUrl, '_blank');
+        else alert('No es posible abrir este archivo desde aquí.');
+      });
+
+      const dlBtn = document.createElement('button');
+      dlBtn.className = 'small';
+      dlBtn.textContent = 'Descargar';
+      dlBtn.addEventListener('click', () => {
+        if (openUrl) {
+          const a = document.createElement('a');
+          a.href = openUrl;
+          a.download = name;
+          a.click();
+        } else if (blobUrl) {
+          const a = document.createElement('a');
+          a.href = blobUrl;
+          a.download = name;
+          a.click();
+        } else {
+          alert('No es posible descargar este archivo desde aquí.');
+        }
+      });
+
+      actions.appendChild(openBtn);
+      actions.appendChild(dlBtn);
+
+      card.appendChild(left);
+      card.appendChild(actions);
+
+      listEl.appendChild(card);
+    }
+
+    // --- Opción A: Carpeta local (File System Access API) ---
+    async function handleDirectoryPick() {
+      if (!('showDirectoryPicker' in window)) {
+        alert('El navegador no soporta showDirectoryPicker. Prueba en Chrome/Edge o usa la opción GitHub.');
+        return;
+      }
+
+      try {
+        const dirHandle = await window.showDirectoryPicker();
+        clearList();
+        await traverseDirectory(dirHandle, dirHandle.name);
+      } catch (err) {
+        console.error(err);
+        alert('Selección cancelada o error: ' + (err.message || err));
+      }
+    }
+
+    async function traverseDirectory(dirHandle, basePath) {
+      // Recorrer de forma recursiva. values() devuelve handles (archivo o directorio).
+      for await (const entry of dirHandle.values()) {
+        if (entry.kind === 'file') {
+          const file = await entry.getFile();
+          const blobUrl = URL.createObjectURL(file);
+          addFileCard({
+            name: file.name,
+            path: basePath + '/' + file.name,
+            blobUrl
+          });
+        } else if (entry.kind === 'directory') {
+          await traverseDirectory(entry, basePath + '/' + entry.name);
+        }
+      }
+    }
+
+    pickDirBtn.addEventListener('click', handleDirectoryPick);
+
+    // --- Opción B: GitHub public repo (usa la API de git trees) ---
+    async function handleGithubLoad() {
+      const raw = ghInput.value.trim();
+      if (!raw) { alert('Pega la URL o owner/repo'); return; }
+
+      // Normalizar input y extraer owner/repo y branch si está
+      let ownerRepo = raw;
+      let branch = 'main';
+
+      try {
+        // Si es URL completa
+        const url = new URL(raw.startsWith('http') ? raw : 'https://github.com/' + raw);
+        const parts = url.pathname.replace(/^\/|\/$/g, '').split('/');
+        if (parts.length >= 2) {
+          ownerRepo = parts[0] + '/' + parts[1];
+          // si hay /tree/branch -> usar branch
+          const treeIdx = parts.indexOf('tree');
+          if (treeIdx >= 0 && parts.length > treeIdx + 1) branch = parts[treeIdx + 1];
+        } else {
+          // si no es url, puede ser owner/repo o owner/repo@branch
+          const direct = raw;
+          if (direct.includes('@')) {
+            const [or, br] = direct.split('@');
+            ownerRepo = or;
+            branch = br || branch;
+          } else if (direct.split('/').length === 2) {
+            ownerRepo = direct;
+          } else throw new Error('Formato inválido');
+        }
+      } catch (e) {
+        // tratar input simple owner/repo o owner/repo@branch
+        if (raw.includes('@')) {
+          const [or, br] = raw.split('@');
+          ownerRepo = or;
+          branch = br || branch;
+        } else {
+          ownerRepo = raw;
+        }
+      }
+
+      const [owner, repo] = ownerRepo.split('/');
+      if (!owner || !repo) { alert('owner/repo inválido'); return; }
+
+      clearList();
+      const apiUrl = `https://api.github.com/repos/${owner}/${repo}/git/trees/${encodeURIComponent(branch)}?recursive=1`;
+
+      try {
+        const res = await fetch(apiUrl, { headers: { Accept: 'application/vnd.github.v3+json' }});
+        if (!res.ok) {
+          // intentar con branch "master" si falla
+          if (branch !== 'master') {
+            const tryMaster = await fetch(`https://api.github.com/repos/${owner}/${repo}/git/trees/master?recursive=1`);
+            if (tryMaster.ok) {
+              const payload = await tryMaster.json();
+              return renderGitTree(payload, owner, repo, 'master');
+            }
+          }
+          throw new Error(`GitHub API error: ${res.status} ${res.statusText}`);
+        }
+        const data = await res.json();
+        renderGitTree(data, owner, repo, branch);
+      } catch (err) {
+        console.error(err);
+        alert('Error al cargar desde GitHub: ' + (err.message || err));
+      }
+    }
+
+    function renderGitTree(data, owner, repo, branch) {
+      if (!data || !data.tree) {
+        alert('Respuesta inesperada de GitHub');
+        return;
+      }
+      // data.tree es un array con {path, mode, type, sha, size, url}
+      const files = data.tree.filter(item => item.type === 'blob');
+      if (files.length === 0) {
+        alert('No se encontraron archivos (o repo vacío)');
+        return;
+      }
+
+      files.forEach(f => {
+        const rawUrl = `https://raw.githubusercontent.com/${owner}/${repo}/${branch}/${f.path}`;
+        addFileCard({
+          name: f.path.split('/').pop(),
+          path: f.path,
+          openUrl: rawUrl
+        });
+      });
+    }
+
+    ghLoadBtn.addEventListener('click', handleGithubLoad);
+
+    // Atajos: Enter en el input lanza carga
+    ghInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') handleGithubLoad();
+    });
+  </script>
+</body>
+</html>
