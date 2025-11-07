@@ -182,17 +182,22 @@
       verificarVictoria();
     }
 
-    function verificarVictoria() {
-      const completo = nivelActual.potions.every(p =>
-        p.length === 0 || p.every(c => c === p[0])
-      );
-      if (completo) {
-        estado = "Completado";
-        document.getElementById("estado").textContent = estado;
-        alert("Nivel completado!");
-      }
-    }
+   function verificarVictoria() {
+  // Frascos correctamente completados (solo un color y llenos)
+  const completos = nivelActual.potions.filter(p =>
+    p.length === 4 && p.every(c => c === p[0])
+  ).length;
 
+  // Frascos vacíos
+  const vacíos = nivelActual.potions.filter(p => p.length === 0).length;
+
+  // Si todos los frascos con contenido están completos y solo quedan los vacíos
+  if (completos + vacíos === nivelActual.potions.length && vacíos >= 1) {
+    estado = "Completado";
+    document.getElementById("estado").textContent = estado;
+    alert("Nivel completado!");
+  }
+}
     cargarNivel(1).then(nivel => mostrarNivel(nivel));
   </script>
 </body>
