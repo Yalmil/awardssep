@@ -185,7 +185,7 @@
    function verificarVictoria() {
   // Frascos correctamente completados (solo un color y llenos)
   const completos = nivelActual.potions.filter(p =>
-    p.length === 4 && p.every(c => c === p[0])
+    p.length === 3 && p.every(c => c === p[0])
   ).length;
 
   // Frascos vacíos
