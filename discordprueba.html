@@ -1,0 +1,428 @@
+<!doctype html>
+
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Yalmil Chat — Discord-like</title>
+  <link rel="icon" href="https://cdn.discordapp.com/emojis/1416607460201857168.png?v=1" type="image/png">
+  <meta property="og:title" content="Yalmil.com" />
+  <meta property="og:description" content="<aqui pon un texto relacionado al html>" />
+  <meta property="og:image" content="https://cdn.discordapp.com/attachments/1355008732576088204/1402309070014124102/Screenshot_20250804-221210.png?ex=68937197&is=68922017&hm=1fa6f462304b2b8cf8a0875053730f988d725d114fbf2648fcb87ee1b67b6a76&" />
+  <meta property="og:url" content="https://yalmil.github.io/Yalmil.com/" />
+  <meta property="og:type" content="website" />  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(135deg, #0a0a0a, #1a001f);
+      color: #e5ccff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      min-height: 100vh;
+      padding: 2rem 1rem;
+      animation: fadeIn 1s ease-out;
+      text-align: center;
+      overflow-x: hidden;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    h1 {
+      margin: 1rem 0 0.5rem;
+      font-size: 2.5rem;
+      color: #c084fc;
+      text-shadow: 0 0 10px #c084fc;
+    }
+
+    p {
+      font-size: 1.2rem;
+      color: #e5ccff;
+      text-shadow: 0 0 6px #c084fc88;
+    }
+
+    .app {
+      width: 100%;
+      max-width: 1200px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(0,0,0,0.12));
+      border: 1px solid rgba(192,132,252,0.12);
+      border-radius: 16px;
+      display: grid;
+      grid-template-columns: 260px 1fr 320px;
+      gap: 1rem;
+      padding: 1rem;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+    }
+
+    /* Sidebar canales */
+    .sidebar {
+      padding: 1rem;
+      border-radius: 12px;
+      background: rgba(40,0,60,0.18);
+      border: 1px solid rgba(192,132,252,0.08);
+      min-height: 480px;
+      display:flex;
+      flex-direction:column;
+      gap:0.75rem;
+      align-items:stretch;
+    }
+
+    .logo {
+      display:flex;
+      gap:0.5rem;
+      align-items:center;
+      justify-content:flex-start;
+    }
+
+    .logo img{ width:34px; height:34px; border-radius:8px }
+    .logo .title{ font-weight:600; color:#ffd7ff }
+
+    .channels { flex:1; overflow:auto; padding-top:0.5rem }
+    .channel{ display:flex; align-items:center; gap:0.5rem; padding:0.5rem; border-radius:8px; cursor:pointer; transition:transform 0.12s, background 0.12s; }
+    .channel:hover{ transform:translateY(-2px); background:rgba(200,150,255,0.04) }
+    .channel.active{ background:linear-gradient(90deg, rgba(192,132,252,0.12), rgba(192,132,252,0.06)); border:1px solid rgba(192,132,252,0.18) }
+
+    .new-channel{ display:flex; gap:0.5rem; }
+    .new-channel input{ flex:1; padding:0.45rem; border-radius:8px; border:1px solid rgba(255,255,255,0.06); background:transparent; color:inherit }
+    .btn{ padding:0.5rem 0.65rem; border-radius:10px; border:1px solid rgba(192,132,252,0.16); background:rgba(192,132,252,0.06); cursor:pointer }
+
+    /* Main chat */
+    .chat {
+      padding:1rem;
+      border-radius:12px;
+      background: linear-gradient(180deg, rgba(0,0,0,0.15), rgba(0,0,0,0.06));
+      min-height:480px;
+      display:flex; flex-direction:column; gap:0.75rem;
+    }
+
+    .messages{ flex:1; overflow:auto; padding:0.5rem; display:flex; flex-direction:column; gap:0.6rem }
+    .message{ display:flex; gap:0.75rem; align-items:flex-start }
+    .avatar{ width:40px; height:40px; border-radius:8px; background:#2b002f; display:flex; align-items:center; justify-content:center; font-weight:700 }
+    .bubble{ max-width:78%; background:rgba(255,255,255,0.03); padding:0.6rem 0.75rem; border-radius:10px; border:1px solid rgba(192,132,252,0.06); text-align:left }
+    .meta{ font-size:0.85rem; opacity:0.8 }
+
+    .composer{ display:flex; gap:0.5rem; align-items:center }
+    .composer input{ flex:1; padding:0.7rem 0.85rem; border-radius:10px; border:1px solid rgba(255,255,255,0.06); background:transparent; color:inherit }
+
+    /* Right panel */
+    .right { padding:1rem; border-radius:12px; background: rgba(40,0,60,0.14); min-height:480px; display:flex; flex-direction:column; gap:0.75rem }
+    .profile { display:flex; gap:0.75rem; align-items:center }
+    .profile img{ width:64px; height:64px; border-radius:12px }
+
+    .setting{ display:flex; justify-content:space-between; align-items:center; padding:0.6rem; border-radius:8px; border:1px solid rgba(255,255,255,0.03) }
+
+    /* small screens */
+    @media (max-width: 980px){
+      .app{ grid-template-columns: 1fr; }
+      .sidebar, .right{ display:none }
+    }
+
+    /* tiny utility */
+    .muted{ opacity:0.8; font-size:0.95rem }
+
+  </style></head>
+<body>
+  <h1>Yalmil Chat</h1>
+  <p>Versión reducida tipo "Discord" con Firebase + Google Sign-In</p>  <div class="app" id="app" style="display:none">
+    <aside class="sidebar">
+      <div class="logo"><img src="https://cdn.discordapp.com/emojis/1416607460201857168.png?v=1" alt="logo"><div class="title">Yalmil Chat</div></div>
+      <div class="muted">Canales</div>
+      <div class="channels" id="channelsList"></div>
+      <div class="new-channel">
+        <input id="newChannelName" placeholder="Nuevo canal" />
+        <button class="btn" id="createChannelBtn">Crear</button>
+      </div>
+      <div style="margin-top:0.5rem" class="muted">Usuario</div>
+      <div id="userSummary" class="setting">No autenticado</div>
+      <button class="btn" id="signOutBtn" style="display:none">Cerrar sesión</button>
+    </aside><main class="chat">
+  <div style="display:flex; justify-content:space-between; align-items:center">
+    <div class="muted" id="currentChannelTitle"># general</div>
+    <div class="muted">Conectado: <span id="presenceCount">0</span></div>
+  </div>
+
+  <div class="messages" id="messages"></div>
+
+  <div class="composer">
+    <input id="messageInput" placeholder="Escribe un mensaje..." />
+    <button class="btn" id="sendBtn">Enviar</button>
+  </div>
+</main>
+
+<aside class="right">
+  <div class="profile" id="profileCard">
+    <img id="profileAvatar" src="https://cdn.discordapp.com/emojis/1416607460201857168.png?v=1" alt="avatar">
+    <div>
+      <div id="profileName" style="font-weight:600">Invitado</div>
+      <div id="profileEmail" class="muted">-</div>
+    </div>
+  </div>
+
+  <div class="muted">Ajustes</div>
+  <div class="setting">
+    <div>Tema (solo visual)</div>
+    <div><button class="btn" id="toggleTheme">Cambiar</button></div>
+  </div>
+
+  <div class="setting">
+    <div>Eliminar mi perfil (solo UI)</div>
+    <div><button class="btn" id="clearProfile">Eliminar</button></div>
+  </div>
+
+  <div class="muted" style="margin-top:1rem">Información</div>
+  <div class="muted">Mensajes guardados en Firebase Realtime DB</div>
+</aside>
+
+  </div>  <div id="authBox" style="max-width:480px; width:100%">
+    <div style="background:rgba(255,255,255,0.02); padding:1rem; border-radius:12px; border:1px solid rgba(192,132,252,0.06)">
+      <h2>Inicia sesión con Google</h2>
+      <p>Usa tu cuenta de Google para entrar y chatear. Mensajes en tiempo real guardados en Firebase.</p>
+      <button class="btn" id="googleSignIn">Entrar con Google</button>
+      <div style="margin-top:1rem; opacity:0.85; font-size:0.95rem">Nota: activa Google Sign-In en la consola de Firebase y añade el dominio donde alojes esta página a dominios autorizados.</div>
+    </div>
+  </div>  <script type="module">
+    // Firebase SDK (modular) imports via CDN
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js';
+    import { getAnalytics } from 'https://www.gstatic.com/firebasejs/9.22.2/firebase-analytics.js';
+    import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/9.22.2/firebase-auth.js';
+    import { getDatabase, ref, push, onChildAdded, onValue, set, child, update } from 'https://www.gstatic.com/firebasejs/9.22.2/firebase-database.js';
+
+    // Tu configuración de Firebase (la que me pasaste)
+    const firebaseConfig = {
+      apiKey: "AIzaSyAZoRcoeC3MFMPYJWgl4dmNjq-U51dKD5o",
+      authDomain: "databaseloginweb.firebaseapp.com",
+      databaseURL: "https://databaseloginweb-default-rtdb.firebaseio.com",
+      projectId: "databaseloginweb",
+      storageBucket: "databaseloginweb.firebasestorage.app",
+      messagingSenderId: "121538864529",
+      appId: "1:121538864529:web:e92aaeaa4ba52618162630",
+      measurementId: "G-M5CBRMJ9BN"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    let analytics;
+    try { analytics = getAnalytics(app); } catch(e){ /* analytics en entornos que no lo permiten puede fallar */ }
+
+    const auth = getAuth();
+    const db = getDatabase(app);
+    const provider = new GoogleAuthProvider();
+
+    // UI refs
+    const authBox = document.getElementById('authBox');
+    const appContainer = document.getElementById('app');
+    const googleBtn = document.getElementById('googleSignIn');
+    const signOutBtn = document.getElementById('signOutBtn');
+    const userSummary = document.getElementById('userSummary');
+
+    const profileName = document.getElementById('profileName');
+    const profileEmail = document.getElementById('profileEmail');
+    const profileAvatar = document.getElementById('profileAvatar');
+
+    const channelsList = document.getElementById('channelsList');
+    const createChannelBtn = document.getElementById('createChannelBtn');
+    const newChannelName = document.getElementById('newChannelName');
+
+    const messagesEl = document.getElementById('messages');
+    const messageInput = document.getElementById('messageInput');
+    const sendBtn = document.getElementById('sendBtn');
+    const currentChannelTitle = document.getElementById('currentChannelTitle');
+    const presenceCount = document.getElementById('presenceCount');
+
+    let currentUser = null;
+    let currentChannel = 'general';
+
+    // Basic helpers
+    function showApp(){ authBox.style.display='none'; appContainer.style.display='grid'; }
+    function showAuth(){ authBox.style.display='block'; appContainer.style.display='none'; }
+
+    // Sign in with Google
+    googleBtn.addEventListener('click', async ()=>{
+      try{
+        await signInWithPopup(auth, provider);
+      }catch(e){ alert('Error al iniciar sesión: '+e.message) }
+    });
+
+    signOutBtn.addEventListener('click', async ()=>{
+      await signOut(auth);
+    });
+
+    // Auth state
+    onAuthStateChanged(auth, async (user)=>{
+      if(user){
+        currentUser = user;
+        // save basic profile to db
+        const userRef = ref(db, 'users/' + user.uid);
+        set(userRef, {
+          uid: user.uid,
+          name: user.displayName || 'Sin nombre',
+          email: user.email || '',
+          photoURL: user.photoURL || ''
+        });
+
+        profileName.textContent = user.displayName || 'Sin nombre';
+        profileEmail.textContent = user.email || '';
+        profileAvatar.src = user.photoURL || profileAvatar.src;
+        userSummary.textContent = user.displayName || user.email || 'Usuario';
+        signOutBtn.style.display = 'block';
+        showApp();
+      } else {
+        currentUser = null;
+        profileName.textContent = 'Invitado';
+        profileEmail.textContent = '-';
+        profileAvatar.src = 'https://cdn.discordapp.com/emojis/1416607460201857168.png?v=1';
+        userSummary.textContent = 'No autenticado';
+        signOutBtn.style.display = 'none';
+        showAuth();
+      }
+    });
+
+    // Channels: ensure a default 'general' exists
+    const channelsRef = ref(db, 'channels');
+    async function ensureDefaultChannel(){
+      onValue(channelsRef, snapshot=>{
+        if(!snapshot.exists()){ set(channelsRef + '/general', {name:'general'}); }
+      }, {onlyOnce:true});
+    }
+    // A safer ensure: create general if missing
+    async function createDefaultIfMissing(){
+      const generalRef = child(ref(db), 'channels/general');
+      onValue(generalRef, snap=>{
+        if(!snap.exists()){
+          set(generalRef, {name:'general'});
+        }
+      }, {onlyOnce:true});
+    }
+    createDefaultIfMissing();
+
+    // Render channels list and listen for new
+    function addChannelToList(key, data){
+      const div = document.createElement('div');
+      div.className = 'channel' + (key===currentChannel? ' active':'');
+      div.dataset.key = key;
+      div.innerHTML = `<div>#</div><div style="flex:1;text-align:left">${data.name}</div>`;
+      div.addEventListener('click', ()=>{ switchChannel(key, data.name) });
+      channelsList.appendChild(div);
+    }
+
+    // initial load & live updates
+    onChildAdded(channelsRef, (snap)=>{
+      const key = snap.key;
+      const val = snap.val();
+      // avoid duplicates
+      if(!channelsList.querySelector(`[data-key='${key}']`)) addChannelToList(key, val);
+    });
+
+    createChannelBtn.addEventListener('click', ()=>{
+      const name = (newChannelName.value||'').trim();
+      if(!name) return alert('Introduce un nombre');
+      const newRef = push(ref(db, 'channels'));
+      set(newRef, { name });
+      newChannelName.value='';
+    });
+
+    // Switch channel
+    function clearMessages(){ messagesEl.innerHTML=''; }
+    function switchChannel(key, name){
+      currentChannel = key;
+      currentChannelTitle.textContent = '# ' + name;
+      // mark active class
+      channelsList.querySelectorAll('.channel').forEach(c=> c.classList.toggle('active', c.dataset.key===key));
+      // detach previous listeners by recreating messages container
+      clearMessages();
+      listenMessagesForChannel(key);
+      // update presence (optional)
+      updatePresenceCount(key);
+    }
+
+    // Messages
+    function formatTime(ts){ const d=new Date(ts); return d.toLocaleTimeString(); }
+
+    function appendMessage(msg){
+      const el = document.createElement('div');
+      el.className = 'message';
+      el.innerHTML = `<div class="avatar">${(msg.name||'U').slice(0,2).toUpperCase()}</div>
+        <div>
+          <div class="meta"><strong>${msg.name||'Invitado'}</strong> <span class="muted">· ${formatTime(msg.ts)}</span></div>
+          <div class="bubble">${escapeHtml(msg.text)}</div>
+        </div>`;
+      messagesEl.appendChild(el);
+      // autoscroll
+      messagesEl.scrollTop = messagesEl.scrollHeight;
+    }
+
+    function escapeHtml(str){ if(!str) return ''; return String(str).replace(/[&<>"']/g, function(m){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]; }); }
+
+    // Listen messages in a channel
+    let listeners = {};
+    function listenMessagesForChannel(channelKey){
+      const msgsRef = ref(db, 'messages/' + channelKey);
+      // Use onChildAdded to get realtime
+      onChildAdded(msgsRef, (snap)=>{
+        const val = snap.val();
+        appendMessage(val);
+      });
+    }
+
+    // send message
+    sendBtn.addEventListener('click', async ()=>{
+      const text = (messageInput.value||'').trim();
+      if(!text) return;
+      if(!currentUser) return alert('Debes iniciar sesión para enviar mensajes');
+      const payload = { uid: currentUser.uid, name: currentUser.displayName || 'Usuario', text, ts: Date.now() };
+      const msgsRef = ref(db, 'messages/' + currentChannel);
+      await push(msgsRef, payload);
+      messageInput.value='';
+    });
+
+    // allow Enter key
+    messageInput.addEventListener('keydown', (e)=>{ if(e.key==='Enter'){ e.preventDefault(); sendBtn.click(); } });
+
+    // Initialize default channel view
+    // wait a bit to allow channels to load
+    setTimeout(()=>{
+      // If general exists in DOM, click it; else create and switch
+      const generalNode = channelsList.querySelector('[data-key="general"]');
+      if(generalNode){ generalNode.click(); }
+      else { // ensure it's created and then switch
+        set(ref(db, 'channels/general'), { name: 'general' }).then(()=> switchChannel('general','general'));
+      }
+    }, 800);
+
+    // Presence count (very simple: count messages in channel as proxy) — for demo only
+    function updatePresenceCount(channelKey){
+      const msgsRef = ref(db, 'messages/' + channelKey);
+      onValue(msgsRef, snap=>{ const count = snap.exists()? Object.keys(snap.val()).length : 0; presenceCount.textContent = count; });
+    }
+
+    // Theme toggle (visual only)
+    const toggleThemeBtn = document.getElementById('toggleTheme');
+    toggleThemeBtn.addEventListener('click', ()=>{
+      document.body.classList.toggle('alt-theme');
+      alert('Tema cambiado (solo visual)');
+    });
+
+    // Clear profile UI
+    document.getElementById('clearProfile').addEventListener('click', ()=>{
+      if(confirm('Eliminar datos locales de perfil? (esto no borra tu cuenta en Firebase)')){
+        profileName.textContent='Invitado'; profileEmail.textContent='-'; profileAvatar.src='https://cdn.discordapp.com/emojis/1416607460201857168.png?v=1';
+      }
+    });
+
+    // Utility: escape HTML used above
+
+    // Small UX: click channel created elsewhere
+    channelsList.addEventListener('click', (e)=>{
+      const ch = e.target.closest('.channel'); if(ch) ch.click();
+    });
+
+    // final: if user was already logged in, onAuthStateChanged will open app and listeners
+  </script></body>
+  </html>
