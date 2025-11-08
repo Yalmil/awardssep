@@ -217,6 +217,43 @@ footer {
 </div>
 
 <script>
+// ===== FUNCIONES DE COOKIES =====
+function setCookie(nombre, valor, dias = 365) {
+  const fecha = new Date();
+  fecha.setTime(fecha.getTime() + (dias*24*60*60*1000));
+  document.cookie = `${nombre}=${encodeURIComponent(valor)}; expires=${fecha.toUTCString()}; path=/`;
+}
+
+function getCookie(nombre) {
+  const partes = document.cookie.split('; ');
+  for (let parte of partes) {
+    const [clave, valor] = parte.split('=');
+    if (clave === nombre) return decodeURIComponent(valor);
+  }
+  return null;
+}
+
+function guardarDatos() {
+  const datos = { baneos, bpc, empleados, velocidad, costoOdio, costoEmpleado, costoYalgui };
+  setCookie("datosJuego", JSON.stringify(datos));
+}
+
+function cargarDatos() {
+  const datosGuardados = getCookie("datosJuego");
+  if (datosGuardados) {
+    try {
+      const d = JSON.parse(datosGuardados);
+      baneos = d.baneos ?? 0;
+      bpc = d.bpc ?? 1;
+      empleados = d.empleados ?? 0;
+      velocidad = d.velocidad ?? 2500;
+      costoOdio = d.costoOdio ?? 10;
+      costoEmpleado = d.costoEmpleado ?? 50;
+      costoYalgui = d.costoYalgui ?? 200;
+    } catch(e) { console.warn("Error al cargar cookies"); }
+  }
+}
+
 // ===== VARIABLES =====
 let baneos = 0, bpc = 1, empleados = 0, velocidad = 2500;
 let costoOdio = 10, costoEmpleado = 50, costoYalgui = 200;
@@ -231,6 +268,7 @@ function actualizarPantalla() {
   document.getElementById("costo-odio").textContent = costoOdio;
   document.getElementById("costo-empleado").textContent = costoEmpleado;
   document.getElementById("costo-yalgui").textContent = costoYalgui;
+  guardarDatos();
 }
 
 // ===== CLICK PRINCIPAL =====
@@ -335,8 +373,10 @@ setInterval(() => {
 }, 1000);
 
 // ===== INICIO =====
+cargarDatos();
 actualizarPantalla();
 actualizarContador();
+iniciarAutoClick();
 </script>
 </body>
 </html>
