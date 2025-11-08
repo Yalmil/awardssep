@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Juego: Banear Channels</title>
+<title>Banear Channels</title>
 
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
@@ -19,6 +19,7 @@ body {
   flex-direction: column;
   min-height: 100vh;
   animation: fadeIn 0.8s ease-out;
+  overflow: hidden;
 }
 
 @keyframes fadeIn {
@@ -131,13 +132,50 @@ footer {
   background-color: #330800;
   border-top: 1px solid #662200;
 }
+
+/* === Overlay y animación de calculadora === */
+#overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.85);
+  display: none;
+  justify-content: center;
+  align-items: center;
+  z-index: 10;
+  animation: fadeIn 0.5s ease;
+}
+
+.calculadora-popup {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 20px;
+  padding: 30px;
+  text-align: center;
+  color: #fff;
+  box-shadow: 0 0 25px #ffffff55;
+  animation: popIn 0.6s ease;
+}
+
+@keyframes popIn {
+  from { transform: scale(0.8); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+.calculadora-popup h2 {
+  margin-bottom: 10px;
+}
+
+#contador {
+  margin-top: 20px;
+  font-size: 18px;
+  color: #ffcc88;
+}
 </style>
 </head>
 
 <body>
 
 <header>
-  <h1>Banea a todos los Channels!</h1>
+  <h1>¡Banea a todos los Channels!</h1>
 </header>
 
 <main>
@@ -148,102 +186,46 @@ footer {
     <p><strong>Baneos por click:</strong> <span id="bpc">1</span></p>
     <p><strong>Empleados:</strong> <span id="empleados">0</span></p>
     <p><strong>Velocidad AutoClick:</strong> <span id="velocidad">2.5s</span></p>
+    <p id="contador"><strong>Próxima calculadora en:</strong> <span id="tiempo-restante">05:00</span></p>
   </div>
 
-  <div class="mejoras" id="mejoras">
-    <div class="mejora">
-      <h3>Generar Odio</h3>
-      <p>Aumenta los baneos por click en +0.5</p>
-      <p>Costo: <span id="costo-odio">10</span> baneos</p>
-      <button onclick="comprarOdio()">Comprar</button>
-    </div>
-
-    <div class="mejora">
-      <h3>Contratar Empleado</h3>
-      <p>Hace clics automáticos cada cierto tiempo</p>
-      <p>Costo: <span id="costo-empleado">50</span> baneos</p>
-      <button onclick="comprarEmpleado()">Comprar</button>
-    </div>
-
-    <div class="mejora">
-      <h3>Usar Yalgui</h3>
-      <p>Aumenta la velocidad del auto click</p>
-      <p>Costo: <span id="costo-yalgui">200</span> baneos</p>
-      <button onclick="comprarYalgui()">Comprar</button>
-    </div>
-  </div>
+  <div class="mejoras" id="mejoras"></div>
 </main>
 
 <footer>
   <p>Hecho con odio para Channel</p>
 </footer>
 
+<!-- Overlay de aparición -->
+<div id="overlay">
+  <div class="calculadora-popup" id="popup">
+    <h2 id="calc-nombre">Calculadora</h2>
+    <p id="calc-descripcion">Una nueva calculadora ha aparecido...</p>
+    <button id="btn-si">Sí</button>
+    <button id="btn-no">No</button>
+  </div>
+</div>
+
 <script>
-// ===== FUNCIONES DE COOKIES =====
-function setCookie(name, value, days = 365) {
-  const d = new Date();
-  d.setTime(d.getTime() + (days*24*60*60*1000));
-  const expires = "expires="+ d.toUTCString();
-  document.cookie = name + "=" + encodeURIComponent(value) + ";" + expires + ";path=/";
-}
-
-function getCookie(name) {
-  const cname = name + "=";
-  const decoded = decodeURIComponent(document.cookie);
-  const ca = decoded.split(';');
-  for(let c of ca) {
-    while (c.charAt(0) == ' ') c = c.substring(1);
-    if (c.indexOf(cname) == 0) return c.substring(cname.length, c.length);
-  }
-  return "";
-}
-
-// ===== VARIABLES =====
-let baneos = parseFloat(getCookie("baneos")) || 0;
-let bpc = parseFloat(getCookie("bpc")) || 1;
-let empleados = parseInt(getCookie("empleados")) || 0;
-let velocidad = parseInt(getCookie("velocidad")) || 2500;
-let costoOdio = parseInt(getCookie("costoOdio")) || 10;
-let costoEmpleado = parseInt(getCookie("costoEmpleado")) || 50;
-let costoYalgui = parseInt(getCookie("costoYalgui")) || 200;
-let autoClickInterval = null;
-
-// ===== NUEVAS VARIABLES (CALCULADORAS) =====
+let baneos = 0, bpc = 1, empleados = 0, velocidad = 2500;
 let calculadoras = 0;
-let calculadoraCostoBase = 100;
-let calculadoraGanancia = 2; // baneos por segundo
-let tiempoEntreCalculadoras = 30000; // 30 segundos
+let calculadoraGananciaBase = 2;
+let tiempoRestante = 300; // 5 minutos
 
-// ===== ELEMENTOS =====
-const baneoDisplay = document.getElementById("baneos");
-const bpcDisplay = document.getElementById("bpc");
-const empleadosDisplay = document.getElementById("empleados");
-const velocidadDisplay = document.getElementById("velocidad");
-const costoOdioDisplay = document.getElementById("costo-odio");
-const costoEmpleadoDisplay = document.getElementById("costo-empleado");
-const costoYalguiDisplay = document.getElementById("costo-yalgui");
+const contadorDisplay = document.getElementById("tiempo-restante");
 const mejorasDiv = document.getElementById("mejoras");
-
-// ===== FUNCIONES =====
-function guardarDatos() {
-  setCookie("baneos", baneos);
-  setCookie("bpc", bpc);
-  setCookie("empleados", empleados);
-  setCookie("velocidad", velocidad);
-  setCookie("costoOdio", costoOdio);
-  setCookie("costoEmpleado", costoEmpleado);
-  setCookie("costoYalgui", costoYalgui);
-}
+const overlay = document.getElementById("overlay");
+const popup = document.getElementById("popup");
+const calcNombre = document.getElementById("calc-nombre");
+const calcDescripcion = document.getElementById("calc-descripcion");
+const btnSi = document.getElementById("btn-si");
+const btnNo = document.getElementById("btn-no");
 
 function actualizarPantalla() {
-  baneoDisplay.textContent = baneos.toFixed(1);
-  bpcDisplay.textContent = bpc.toFixed(1);
-  empleadosDisplay.textContent = empleados;
-  velocidadDisplay.textContent = (velocidad / 1000).toFixed(2) + "s";
-  costoOdioDisplay.textContent = costoOdio;
-  costoEmpleadoDisplay.textContent = costoEmpleado;
-  costoYalguiDisplay.textContent = costoYalgui;
-  guardarDatos();
+  document.getElementById("baneos").textContent = baneos.toFixed(1);
+  document.getElementById("bpc").textContent = bpc.toFixed(1);
+  document.getElementById("empleados").textContent = empleados;
+  document.getElementById("velocidad").textContent = (velocidad / 1000).toFixed(2) + "s";
 }
 
 document.getElementById("baneo-btn").addEventListener("click", () => {
@@ -251,79 +233,62 @@ document.getElementById("baneo-btn").addEventListener("click", () => {
   actualizarPantalla();
 });
 
-function comprarOdio() {
-  if (baneos >= costoOdio) {
-    baneos -= costoOdio;
-    bpc += 0.5;
-    costoOdio = Math.floor(costoOdio * 1.5);
-    actualizarPantalla();
-  }
-}
-
-function comprarEmpleado() {
-  if (baneos >= costoEmpleado) {
-    baneos -= costoEmpleado;
-    empleados++;
-    costoEmpleado = Math.floor(costoEmpleado * 1.7);
-    actualizarPantalla();
-    iniciarAutoClick();
-  }
-}
-
-function comprarYalgui() {
-  if (baneos >= costoYalgui && velocidad > 500) {
-    baneos -= costoYalgui;
-    velocidad -= 250;
-    costoYalgui = Math.floor(costoYalgui * 2);
-    actualizarPantalla();
-    iniciarAutoClick();
-  }
-}
-
-function iniciarAutoClick() {
-  if (autoClickInterval) clearInterval(autoClickInterval);
-  autoClickInterval = setInterval(() => {
-    baneos += empleados * bpc;
-    actualizarPantalla();
-  }, velocidad);
-}
-
-// ===== NUEVAS FUNCIONES (CALCULADORAS) =====
-function crearCalculadora() {
-  const costo = Math.floor(calculadoraCostoBase * (1.8 ** calculadoras));
-  const div = document.createElement("div");
-  div.classList.add("mejora");
-  div.innerHTML = `
-    <h3>Calculadora ${calculadoras + 1}</h3>
-    <p>Genera +${calculadoraGanancia} baneos por segundo</p>
-    <p>Costo: <span>${costo}</span> baneos</p>
-    <button onclick="comprarCalculadora(${costo}, this)">Comprar</button>
-  `;
-  mejorasDiv.appendChild(div);
-}
-
-function comprarCalculadora(costo, boton) {
-  if (baneos >= costo) {
-    baneos -= costo;
-    calculadoras++;
-    actualizarPantalla();
-    boton.disabled = true;
-    boton.textContent = "Comprado";
-  }
-}
-
+// Generar baneos automáticos por calculadoras
 setInterval(() => {
-  crearCalculadora();
-}, tiempoEntreCalculadoras);
-
-setInterval(() => {
-  baneos += calculadoras * calculadoraGanancia;
+  baneos += calculadoras * calculadoraGananciaBase;
   actualizarPantalla();
 }, 1000);
 
-// ===== INICIO =====
-actualizarPantalla();
-if (empleados > 0) iniciarAutoClick();
+// Contador regresivo (5 minutos)
+setInterval(() => {
+  tiempoRestante--;
+  if (tiempoRestante <= 0) {
+    tiempoRestante = 300;
+    aparecerCalculadora();
+  }
+  let min = Math.floor(tiempoRestante / 60).toString().padStart(2, "0");
+  let seg = (tiempoRestante % 60).toString().padStart(2, "0");
+  contadorDisplay.textContent = `${min}:${seg}`;
+}, 1000);
+
+// Función de aparición aleatoria
+function aparecerCalculadora() {
+  overlay.style.display = "flex";
+
+  const tipos = [
+    { nombre: "Calculadora Común", color: "#00ff88", ganancia: 2 },
+    { nombre: "Calculadora Rara", color: "#00aaff", ganancia: 4 },
+    { nombre: "Calculadora Épica", color: "#b366ff", ganancia: 8 },
+    { nombre: "Calculadora Mítica", color: "#ffaa00", ganancia: 15 }
+  ];
+
+  const tipo = tipos[Math.floor(Math.random() * tipos.length)];
+
+  popup.style.border = `3px solid ${tipo.color}`;
+  calcNombre.textContent = tipo.nombre;
+  calcNombre.style.color = tipo.color;
+  calcDescripcion.textContent = "Una " + tipo.nombre + " ha aparecido. ¿Capturar?";
+
+  btnSi.onclick = () => {
+    overlay.style.display = "none";
+    agregarCalculadora(tipo);
+  };
+  btnNo.onclick = () => {
+    overlay.style.display = "none";
+  };
+}
+
+function agregarCalculadora(tipo) {
+  calculadoras++;
+  const div = document.createElement("div");
+  div.classList.add("mejora");
+  div.innerHTML = `
+    <h3 style="color:${tipo.color}">${tipo.nombre}</h3>
+    <p>Genera +${tipo.ganancia} baneos/segundo</p>
+  `;
+  mejorasDiv.appendChild(div);
+  calculadoraGananciaBase += tipo.ganancia / calculadoras;
+}
 </script>
 
 </body>
