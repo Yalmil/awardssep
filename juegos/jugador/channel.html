@@ -85,6 +85,27 @@ h1 {
   display: inline-block;
 }
 
+.mejora h3 {
+  color: #ff8c00;
+}
+
+.mejora button {
+  margin-top: 8px;
+  padding: 10px;
+  border: none;
+  background: linear-gradient(90deg, #ff6a00, #ffb84d);
+  color: #330a00;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  box-shadow: 0 0 8px #ff8c0055;
+}
+
+.mejora button:hover {
+  background: linear-gradient(90deg, #ffaa33, #ffd699);
+  box-shadow: 0 0 15px #ffb84d;
+}
+
 footer {
   background-color: #330800;
   padding: 1rem;
@@ -152,9 +173,34 @@ footer {
   <div class="stats">
     <p><strong>Baneos:</strong> <span id="baneos">0</span></p>
     <p><strong>Baneos por click:</strong> <span id="bpc">1</span></p>
+    <p><strong>Empleados:</strong> <span id="empleados">0</span></p>
+    <p><strong>Velocidad AutoClick:</strong> <span id="velocidad">2.5s</span></p>
   </div>
 
   <div id="contador-calculadora">Siguiente calculadora en: 5:00</div>
+
+  <div id="mejoras">
+    <div class="mejora">
+      <h3>Generar Odio</h3>
+      <p>Aumenta los baneos por click en +0.5</p>
+      <p>Costo: <span id="costo-odio">10</span> baneos</p>
+      <button onclick="comprarOdio()">Comprar</button>
+    </div>
+
+    <div class="mejora">
+      <h3>Contratar Empleado</h3>
+      <p>Hace clics automáticos cada cierto tiempo</p>
+      <p>Costo: <span id="costo-empleado">50</span> baneos</p>
+      <button onclick="comprarEmpleado()">Comprar</button>
+    </div>
+
+    <div class="mejora">
+      <h3>Usar Yalgui</h3>
+      <p>Aumenta la velocidad del auto click</p>
+      <p>Costo: <span id="costo-yalgui">200</span> baneos</p>
+      <button onclick="comprarYalgui()">Comprar</button>
+    </div>
+  </div>
 </main>
 
 <footer><p>Hecho con odio para Channel</p></footer>
@@ -164,21 +210,74 @@ footer {
   <div id="calculadora-popup">
     <h2 id="calc-titulo">¡Ha aparecido una Calculadora!</h2>
     <p id="calc-rarity"></p>
+    <p>¿Capturar?</p>
     <button id="btn-si">Sí</button>
     <button id="btn-no">No</button>
   </div>
 </div>
 
 <script>
-let baneos = 0, bpc = 1;
+// ===== VARIABLES =====
+let baneos = 0, bpc = 1, empleados = 0, velocidad = 2500;
+let costoOdio = 10, costoEmpleado = 50, costoYalgui = 200;
+let autoClickInterval = null;
 
-// === CLICK PRINCIPAL ===
+// ===== FUNCIONES =====
+function actualizarPantalla() {
+  document.getElementById("baneos").textContent = baneos.toFixed(1);
+  document.getElementById("bpc").textContent = bpc.toFixed(1);
+  document.getElementById("empleados").textContent = empleados;
+  document.getElementById("velocidad").textContent = (velocidad/1000).toFixed(2) + "s";
+  document.getElementById("costo-odio").textContent = costoOdio;
+  document.getElementById("costo-empleado").textContent = costoEmpleado;
+  document.getElementById("costo-yalgui").textContent = costoYalgui;
+}
+
+// ===== CLICK PRINCIPAL =====
 document.getElementById("baneo-btn").addEventListener("click", () => {
   baneos += bpc;
-  document.getElementById("baneos").textContent = baneos.toFixed(1);
+  actualizarPantalla();
 });
 
-// === SISTEMA DE CALCULADORA CADA 5 MINUTOS ===
+// ===== MEJORAS =====
+function comprarOdio() {
+  if (baneos >= costoOdio) {
+    baneos -= costoOdio;
+    bpc += 0.5;
+    costoOdio = Math.floor(costoOdio * 1.5);
+    actualizarPantalla();
+  }
+}
+
+function comprarEmpleado() {
+  if (baneos >= costoEmpleado) {
+    baneos -= costoEmpleado;
+    empleados++;
+    costoEmpleado = Math.floor(costoEmpleado * 1.7);
+    iniciarAutoClick();
+    actualizarPantalla();
+  }
+}
+
+function comprarYalgui() {
+  if (baneos >= costoYalgui && velocidad > 500) {
+    baneos -= costoYalgui;
+    velocidad -= 250;
+    costoYalgui = Math.floor(costoYalgui * 2);
+    iniciarAutoClick();
+    actualizarPantalla();
+  }
+}
+
+function iniciarAutoClick() {
+  if (autoClickInterval) clearInterval(autoClickInterval);
+  autoClickInterval = setInterval(() => {
+    baneos += empleados * bpc;
+    actualizarPantalla();
+  }, velocidad);
+}
+
+// ===== CALCULADORA (CADA 5 MINUTOS) =====
 const overlay = document.getElementById("calculadora-overlay");
 const popup = document.getElementById("calculadora-popup");
 const rarityText = document.getElementById("calc-rarity");
@@ -186,7 +285,7 @@ const contador = document.getElementById("contador-calculadora");
 const btnSi = document.getElementById("btn-si");
 const btnNo = document.getElementById("btn-no");
 
-let tiempoRestante = 300; // 5 minutos en segundos
+let tiempoRestante = 300; // 5 minutos
 
 function formatoTiempo(seg) {
   const m = Math.floor(seg / 60);
@@ -200,33 +299,31 @@ function actualizarContador() {
 
 function mostrarCalculadora() {
   const rarezas = [
-    {nombre: "Común", clase: "rarity-verde"},
-    {nombre: "Rara", clase: "rarity-azul"},
-    {nombre: "Épica", clase: "rarity-morado"},
-    {nombre: "Mítica", clase: "rarity-naranja"}
+    {nombre: "Común", clase: "rarity-verde", premio: 50},
+    {nombre: "Rara", clase: "rarity-azul", premio: 150},
+    {nombre: "Épica", clase: "rarity-morado", premio: 500},
+    {nombre: "Mítica", clase: "rarity-naranja", premio: 1500}
   ];
   const seleccion = rarezas[Math.floor(Math.random() * rarezas.length)];
 
   popup.className = seleccion.clase;
   rarityText.textContent = seleccion.nombre;
   overlay.style.display = "flex";
+
+  btnSi.onclick = () => {
+    baneos += seleccion.premio;
+    overlay.style.display = "none";
+    tiempoRestante = 300;
+    actualizarPantalla();
+  };
+
+  btnNo.onclick = () => {
+    overlay.style.display = "none";
+    tiempoRestante = 300;
+    actualizarPantalla();
+  };
 }
 
-btnSi.onclick = () => {
-  baneos += 50;
-  document.getElementById("baneos").textContent = baneos.toFixed(1);
-  overlay.style.display = "none";
-  tiempoRestante = 300;
-  actualizarContador();
-};
-
-btnNo.onclick = () => {
-  overlay.style.display = "none";
-  tiempoRestante = 300;
-  actualizarContador();
-};
-
-// Temporizador
 setInterval(() => {
   if (overlay.style.display === "none" || overlay.style.display === "") {
     tiempoRestante--;
@@ -237,6 +334,8 @@ setInterval(() => {
   }
 }, 1000);
 
+// ===== INICIO =====
+actualizarPantalla();
 actualizarContador();
 </script>
 </body>
