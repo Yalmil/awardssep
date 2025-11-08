@@ -150,7 +150,7 @@ footer {
     <p><strong>Velocidad AutoClick:</strong> <span id="velocidad">2.5s</span></p>
   </div>
 
-  <div class="mejoras">
+  <div class="mejoras" id="mejoras">
     <div class="mejora">
       <h3>Generar Odio</h3>
       <p>Aumenta los baneos por click en +0.5</p>
@@ -208,6 +208,12 @@ let costoEmpleado = parseInt(getCookie("costoEmpleado")) || 50;
 let costoYalgui = parseInt(getCookie("costoYalgui")) || 200;
 let autoClickInterval = null;
 
+// ===== NUEVAS VARIABLES (CALCULADORAS) =====
+let calculadoras = 0;
+let calculadoraCostoBase = 100;
+let calculadoraGanancia = 2; // baneos por segundo
+let tiempoEntreCalculadoras = 30000; // 30 segundos
+
 // ===== ELEMENTOS =====
 const baneoDisplay = document.getElementById("baneos");
 const bpcDisplay = document.getElementById("bpc");
@@ -216,6 +222,7 @@ const velocidadDisplay = document.getElementById("velocidad");
 const costoOdioDisplay = document.getElementById("costo-odio");
 const costoEmpleadoDisplay = document.getElementById("costo-empleado");
 const costoYalguiDisplay = document.getElementById("costo-yalgui");
+const mejorasDiv = document.getElementById("mejoras");
 
 // ===== FUNCIONES =====
 function guardarDatos() {
@@ -280,6 +287,39 @@ function iniciarAutoClick() {
     actualizarPantalla();
   }, velocidad);
 }
+
+// ===== NUEVAS FUNCIONES (CALCULADORAS) =====
+function crearCalculadora() {
+  const costo = Math.floor(calculadoraCostoBase * (1.8 ** calculadoras));
+  const div = document.createElement("div");
+  div.classList.add("mejora");
+  div.innerHTML = `
+    <h3>Calculadora ${calculadoras + 1}</h3>
+    <p>Genera +${calculadoraGanancia} baneos por segundo</p>
+    <p>Costo: <span>${costo}</span> baneos</p>
+    <button onclick="comprarCalculadora(${costo}, this)">Comprar</button>
+  `;
+  mejorasDiv.appendChild(div);
+}
+
+function comprarCalculadora(costo, boton) {
+  if (baneos >= costo) {
+    baneos -= costo;
+    calculadoras++;
+    actualizarPantalla();
+    boton.disabled = true;
+    boton.textContent = "Comprado";
+  }
+}
+
+setInterval(() => {
+  crearCalculadora();
+}, tiempoEntreCalculadoras);
+
+setInterval(() => {
+  baneos += calculadoras * calculadoraGanancia;
+  actualizarPantalla();
+}, 1000);
 
 // ===== INICIO =====
 actualizarPantalla();
