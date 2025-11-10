@@ -6,7 +6,7 @@
   <title>Lootboxes Gratis - Yalmil.com</title>
   <link rel="icon" href="https://cdn.discordapp.com/emojis/1416607460201857168.png?v=1" type="image/png">
   <meta property="og:title" content="Yalmil.com" />
-  <meta property="og:description" content="Abre cofres misteriosos y colecciona objetos épicos sin gastar dinero real" />
+  <meta property="og:description" content="Abre cofres misteriosos, colecciona objetos épicos y tradea con otros jugadores" />
   <meta property="og:image" content="https://cdn.discordapp.com/attachments/1355008732576088204/1402309070014124102/Screenshot_20250804-221210.png?ex=68937197&is=68922017&hm=1fa6f462304b2b8cf8a0875053730f988d725d114fbf2648fcb87ee1b67b6a76&" />
   <meta property="og:url" content="https://yalmil.github.io/Yalmil.com/" />
   <meta property="og:type" content="website" />
@@ -48,6 +48,45 @@
       font-size: 1.2rem;
       color: #e5ccff;
       text-shadow: 0 0 6px #c084fc88;
+    }
+
+    .tabs {
+      display: flex;
+      gap: 1rem;
+      margin: 2rem 0;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .tab {
+      background: rgba(40, 0, 60, 0.4);
+      border: 2px solid #c084fc;
+      border-radius: 0.5rem;
+      padding: 0.8rem 1.5rem;
+      cursor: pointer;
+      transition: all 0.3s;
+      font-weight: 600;
+    }
+
+    .tab:hover {
+      background: rgba(60, 0, 80, 0.6);
+      transform: translateY(-2px);
+    }
+
+    .tab.active {
+      background: linear-gradient(135deg, #c084fc, #a855f7);
+      box-shadow: 0 0 20px #c084fc88;
+    }
+
+    .tab-content {
+      display: none;
+      width: 100%;
+      max-width: 1200px;
+    }
+
+    .tab-content.active {
+      display: block;
+      animation: fadeIn 0.5s ease-out;
     }
 
     .stats {
@@ -333,52 +372,320 @@
       font-size: 1.2rem;
       text-shadow: 0 0 10px #10b981;
     }
+
+    .username-modal {
+      display: flex;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.95);
+      z-index: 2000;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .username-input {
+      background: rgba(40, 0, 60, 0.4);
+      border: 2px solid #c084fc;
+      border-radius: 0.5rem;
+      padding: 0.8rem;
+      font-size: 1rem;
+      color: #e5ccff;
+      width: 100%;
+      max-width: 300px;
+      margin: 1rem 0;
+      font-family: 'Poppins', sans-serif;
+    }
+
+    .username-input:focus {
+      outline: none;
+      box-shadow: 0 0 20px #c084fc88;
+    }
+
+    .trade-section {
+      display: grid;
+      gap: 2rem;
+      margin-top: 2rem;
+    }
+
+    .trade-box {
+      background: rgba(40, 0, 60, 0.4);
+      border: 2px solid #c084fc;
+      border-radius: 1rem;
+      padding: 1.5rem;
+      box-shadow: 0 0 15px #c084fc44;
+    }
+
+    .trade-box h3 {
+      color: #c084fc;
+      text-shadow: 0 0 10px #c084fc;
+      margin-top: 0;
+    }
+
+    .online-users {
+      display: flex;
+      flex-direction: column;
+      gap: 0.8rem;
+      max-height: 400px;
+      overflow-y: auto;
+    }
+
+    .user-card {
+      background: rgba(60, 0, 80, 0.4);
+      border: 2px solid #c084fc44;
+      border-radius: 0.8rem;
+      padding: 1rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      transition: all 0.3s;
+    }
+
+    .user-card:hover {
+      border-color: #c084fc;
+      box-shadow: 0 0 15px #c084fc44;
+    }
+
+    .user-info {
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+    }
+
+    .user-status {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #10b981;
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+
+    .trade-btn {
+      background: linear-gradient(135deg, #c084fc, #a855f7);
+      border: none;
+      color: white;
+      padding: 0.6rem 1.2rem;
+      font-size: 0.9rem;
+      font-weight: 600;
+      border-radius: 0.4rem;
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+
+    .trade-btn:hover {
+      transform: scale(1.05);
+    }
+
+    .trade-offers {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .trade-offer {
+      background: rgba(60, 0, 80, 0.4);
+      border: 2px solid #fbbf24;
+      border-radius: 0.8rem;
+      padding: 1.5rem;
+      animation: slideIn 0.5s ease-out;
+    }
+
+    @keyframes slideIn {
+      from { transform: translateX(-20px); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+
+    .trade-offer-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+
+    .trade-offer-items {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+      margin: 1rem 0;
+    }
+
+    .trade-offer-item {
+      background: rgba(40, 0, 60, 0.6);
+      border: 2px solid;
+      border-radius: 0.5rem;
+      padding: 0.5rem;
+      font-size: 1.2rem;
+    }
+
+    .trade-actions {
+      display: flex;
+      gap: 0.5rem;
+      margin-top: 1rem;
+    }
+
+    .accept-btn {
+      background: linear-gradient(135deg, #10b981, #059669);
+      flex: 1;
+    }
+
+    .reject-btn {
+      background: linear-gradient(135deg, #ef4444, #dc2626);
+      flex: 1;
+    }
+
+    .create-trade-form {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .item-selector {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+      gap: 0.5rem;
+      max-height: 300px;
+      overflow-y: auto;
+      padding: 1rem;
+      background: rgba(20, 0, 30, 0.5);
+      border-radius: 0.5rem;
+    }
+
+    .selectable-item {
+      background: rgba(40, 0, 60, 0.6);
+      border: 2px solid;
+      border-radius: 0.5rem;
+      padding: 0.8rem;
+      cursor: pointer;
+      text-align: center;
+      transition: all 0.3s;
+    }
+
+    .selectable-item:hover {
+      transform: scale(1.1);
+    }
+
+    .selectable-item.selected {
+      box-shadow: 0 0 20px;
+      transform: scale(1.05);
+    }
+
+    .selectable-item .icon {
+      font-size: 1.8rem;
+    }
+
+    .selectable-item .count {
+      font-size: 0.7rem;
+      color: #ffd700;
+      margin-top: 0.3rem;
+    }
   </style>
 </head>
 <body>
+  <div class="username-modal" id="usernameModal">
+    <div class="modal-content" style="border-color: #c084fc;">
+      <h2>🎮 Bienvenido al Juego</h2>
+      <p>Elige tu nombre de usuario</p>
+      <input type="text" id="usernameInput" class="username-input" placeholder="Tu nombre..." maxlength="20">
+      <button class="btn" onclick="setUsername()">¡Comenzar!</button>
+    </div>
+  </div>
+
   <h1>🎁 Lootboxes Místicas</h1>
-  <p>¡Gana monedas y abre cofres para obtener objetos épicos!</p>
+  <p id="welcomeText">¡Gana monedas, abre cofres y tradea con otros!</p>
 
-  <div class="stats">
-    <div class="stat-box">
-      <h3>💰 Monedas</h3>
-      <div class="value" id="coins">0</div>
-    </div>
-    <div class="stat-box">
-      <h3>📦 Cofres Abiertos</h3>
-      <div class="value" id="chestsOpened">0</div>
-    </div>
+  <div class="tabs">
+    <div class="tab active" onclick="switchTab('game')">🎮 Juego</div>
+    <div class="tab" onclick="switchTab('trade')">🔄 Tradeo</div>
   </div>
 
-  <button class="btn" onclick="gainCoins()">🎲 Ganar Monedas (+50)</button>
-
-  <div class="chest-container">
-    <div class="chest" onclick="openChest('basic')" id="basicChest">
-      <div>📦</div>
-      <div class="chest-label">Cofre Básico</div>
-      <div class="chest-cost">50 monedas</div>
-    </div>
-    <div class="chest" onclick="openChest('silver')" id="silverChest">
-      <div>🎁</div>
-      <div class="chest-label">Cofre de Plata</div>
-      <div class="chest-cost">150 monedas</div>
-    </div>
-    <div class="chest" onclick="openChest('gold')" id="goldChest">
-      <div>💎</div>
-      <div class="chest-label">Cofre de Oro</div>
-      <div class="chest-cost">400 monedas</div>
-    </div>
-  </div>
-
-  <div class="inventory">
-    <div class="inventory-header">
-      <h2>🎒 Tu Inventario</h2>
-      <div>
-        <div class="inventory-value">Valor Total: <span id="totalValue">0</span> 💰</div>
-        <button class="sell-all-btn" onclick="sellAll()">💰 Vender Todo</button>
+  <div class="tab-content active" id="gameTab">
+    <div class="stats">
+      <div class="stat-box">
+        <h3>👤 Usuario</h3>
+        <div class="value" id="username" style="font-size: 1.2rem;">-</div>
+      </div>
+      <div class="stat-box">
+        <h3>💰 Monedas</h3>
+        <div class="value" id="coins">0</div>
+      </div>
+      <div class="stat-box">
+        <h3>📦 Cofres Abiertos</h3>
+        <div class="value" id="chestsOpened">0</div>
       </div>
     </div>
-    <div class="inventory-grid" id="inventoryGrid"></div>
+
+    <button class="btn" onclick="gainCoins()">🎲 Ganar Monedas (+50)</button>
+
+    <div class="chest-container">
+      <div class="chest" onclick="openChest('basic')" id="basicChest">
+        <div>📦</div>
+        <div class="chest-label">Cofre Básico</div>
+        <div class="chest-cost">50 monedas</div>
+      </div>
+      <div class="chest" onclick="openChest('silver')" id="silverChest">
+        <div>🎁</div>
+        <div class="chest-label">Cofre de Plata</div>
+        <div class="chest-cost">150 monedas</div>
+      </div>
+      <div class="chest" onclick="openChest('gold')" id="goldChest">
+        <div>💎</div>
+        <div class="chest-label">Cofre de Oro</div>
+        <div class="chest-cost">400 monedas</div>
+      </div>
+    </div>
+
+    <div class="inventory">
+      <div class="inventory-header">
+        <h2>🎒 Tu Inventario</h2>
+        <div>
+          <div class="inventory-value">Valor Total: <span id="totalValue">0</span> 💰</div>
+          <button class="sell-all-btn" onclick="sellAll()">💰 Vender Todo</button>
+        </div>
+      </div>
+      <div class="inventory-grid" id="inventoryGrid"></div>
+    </div>
+  </div>
+
+  <div class="tab-content" id="tradeTab">
+    <div class="trade-section">
+      <div class="trade-box">
+        <h3>👥 Jugadores En Línea</h3>
+        <div class="online-users" id="onlineUsers"></div>
+      </div>
+
+      <div class="trade-box">
+        <h3>📬 Ofertas de Tradeo Recibidas</h3>
+        <div class="trade-offers" id="tradeOffers"></div>
+      </div>
+
+      <div class="trade-box" id="createTradeBox" style="display: none;">
+        <h3>🔄 Crear Oferta de Tradeo</h3>
+        <p>Tradear con: <strong id="tradeTargetUser"></strong></p>
+        <div class="create-trade-form">
+          <div>
+            <h4>Tus objetos a ofrecer:</h4>
+            <div class="item-selector" id="myItemsSelector"></div>
+          </div>
+          <div>
+            <h4>Objetos que solicitas:</h4>
+            <div class="item-selector" id="theirItemsSelector"></div>
+          </div>
+          <div style="display: flex; gap: 0.5rem;">
+            <button class="btn" onclick="sendTradeOffer()" style="flex: 1;">Enviar Oferta</button>
+            <button class="btn reject-btn" onclick="cancelTrade()" style="flex: 1;">Cancelar</button>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 
   <div class="modal" id="rewardModal">
@@ -391,30 +698,52 @@
     </div>
   </div>
 
-  <script>
+  <script type="module">
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+    import { getDatabase, ref, set, onValue, push, remove, update } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyAZoRcoeC3MFMPYJWgl4dmNjq-U51dKD5o",
+      authDomain: "databaseloginweb.firebaseapp.com",
+      databaseURL: "https://databaseloginweb-default-rtdb.firebaseio.com",
+      projectId: "databaseloginweb",
+      storageBucket: "databaseloginweb.firebasestorage.app",
+      messagingSenderId: "121538864529",
+      appId: "1:121538864529:web:e92aaeaa4ba52618162630",
+      measurementId: "G-M5CBRMJ9BN"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const database = getDatabase(app);
+
+    window.database = database;
+    window.dbRef = ref;
+    window.dbSet = set;
+    window.dbOnValue = onValue;
+    window.dbPush = push;
+    window.dbRemove = remove;
+    window.dbUpdate = update;
+
     const items = [
-      // Común
       { name: 'Piedra', icon: '🪨', rarity: 'común', rarityClass: 'common', value: 10 },
       { name: 'Madera', icon: '🪵', rarity: 'común', rarityClass: 'common', value: 12 },
       { name: 'Pluma', icon: '🪶', rarity: 'común', rarityClass: 'common', value: 15 },
       { name: 'Hoja', icon: '🍃', rarity: 'común', rarityClass: 'common', value: 8 },
-      // Poco común
       { name: 'Cristal', icon: '💠', rarity: 'poco común', rarityClass: 'uncommon', value: 40 },
       { name: 'Esmeralda', icon: '💚', rarity: 'poco común', rarityClass: 'uncommon', value: 45 },
       { name: 'Perla', icon: '🔮', rarity: 'poco común', rarityClass: 'uncommon', value: 50 },
-      // Raro
       { name: 'Rubí', icon: '💎', rarity: 'raro', rarityClass: 'rare', value: 120 },
       { name: 'Zafiro', icon: '💙', rarity: 'raro', rarityClass: 'rare', value: 130 },
       { name: 'Estrella', icon: '⭐', rarity: 'raro', rarityClass: 'rare', value: 150 },
-      // Épico
       { name: 'Corona', icon: '👑', rarity: 'épico', rarityClass: 'epic', value: 350 },
       { name: 'Espada Mágica', icon: '⚔️', rarity: 'épico', rarityClass: 'epic', value: 380 },
       { name: 'Escudo Místico', icon: '🛡️', rarity: 'épico', rarityClass: 'epic', value: 400 },
-      // Legendario
       { name: 'Trofeo Dorado', icon: '🏆', rarity: 'legendario', rarityClass: 'legendary', value: 1000 },
       { name: 'Dragón', icon: '🐉', rarity: 'legendario', rarityClass: 'legendary', value: 1200 },
       { name: 'Unicornio', icon: '🦄', rarity: 'legendario', rarityClass: 'legendary', value: 1500 }
     ];
+
+    window.items = items;
 
     const chestTypes = {
       basic: { cost: 50, weights: [60, 25, 10, 4, 1] },
@@ -423,21 +752,303 @@
     };
 
     let gameState = {
+      username: '',
+      userId: '',
       coins: 100,
       chestsOpened: 0,
       inventory: {}
     };
 
+    let currentTradeTarget = null;
+    let selectedMyItems = [];
+    let selectedTheirItems = [];
+    let onlineUsersData = {};
+
+    window.setUsername = function() {
+      const input = document.getElementById('usernameInput').value.trim();
+      if (input.length < 3) {
+        alert('El nombre debe tener al menos 3 caracteres');
+        return;
+      }
+      
+      gameState.username = input;
+      gameState.userId = 'user_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+      
+      document.getElementById('usernameModal').style.display = 'none';
+      document.getElementById('username').textContent = gameState.username;
+      document.getElementById('welcomeText').textContent = `¡Bienvenido ${gameState.username}! 🎮`;
+      
+      saveGame();
+      updateUI();
+      connectToFirebase();
+    };
+
+    function connectToFirebase() {
+      const userRef = window.dbRef(window.database, 'users/' + gameState.userId);
+      window.dbSet(userRef, {
+        username: gameState.username,
+        online: true,
+        lastSeen: Date.now()
+      });
+
+      window.addEventListener('beforeunload', () => {
+        window.dbSet(window.dbRef(window.database, 'users/' + gameState.userId + '/online'), false);
+      });
+
+      const usersRef = window.dbRef(window.database, 'users');
+      window.dbOnValue(usersRef, (snapshot) => {
+        onlineUsersData = snapshot.val() || {};
+        updateOnlineUsers();
+      });
+
+      const tradesRef = window.dbRef(window.database, 'trades/' + gameState.userId);
+      window.dbOnValue(tradesRef, (snapshot) => {
+        const trades = snapshot.val() || {};
+        updateTradeOffers(trades);
+      });
+
+      setInterval(() => {
+        window.dbUpdate(window.dbRef(window.database, 'users/' + gameState.userId), {
+          lastSeen: Date.now()
+        });
+      }, 30000);
+    }
+
+    function updateOnlineUsers() {
+      const container = document.getElementById('onlineUsers');
+      container.innerHTML = '';
+
+      Object.entries(onlineUsersData).forEach(([userId, userData]) => {
+        if (userId !== gameState.userId && userData.online) {
+          const userCard = document.createElement('div');
+          userCard.className = 'user-card';
+          userCard.innerHTML = `
+            <div class="user-info">
+              <div class="user-status"></div>
+              <span>${userData.username}</span>
+            </div>
+            <button class="trade-btn" onclick="startTrade('${userId}', '${userData.username}')">🔄 Tradear</button>
+          `;
+          container.appendChild(userCard);
+        }
+      });
+
+      if (container.children.length === 0) {
+        container.innerHTML = '<p style="color: #9ca3af;">No hay jugadores en línea</p>';
+      }
+    }
+
+    window.startTrade = function(userId, username) {
+      currentTradeTarget = { userId, username };
+      selectedMyItems = [];
+      selectedTheirItems = [];
+      
+      document.getElementById('tradeTargetUser').textContent = username;
+      document.getElementById('createTradeBox').style.display = 'block';
+      
+      renderMyItems();
+      fetchUserInventory(userId);
+    };
+
+    function renderMyItems() {
+      const container = document.getElementById('myItemsSelector');
+      container.innerHTML = '';
+
+      Object.values(gameState.inventory).forEach(item => {
+        if (item.count > 0) {
+          const div = document.createElement('div');
+          div.className = 'selectable-item rarity-' + item.rarityClass;
+          div.onclick = () => toggleItemSelection(item.name, 'my');
+          div.innerHTML = `
+            <div class="icon">${item.icon}</div>
+            <div class="count">x${item.count}</div>
+          `;
+          div.id = 'myitem-' + item.name;
+          container.appendChild(div);
+        }
+      });
+    }
+
+    function fetchUserInventory(userId) {
+      const userRef = window.dbRef(window.database, 'userInventories/' + userId);
+      window.dbOnValue(userRef, (snapshot) => {
+        const inventory = snapshot.val() || {};
+        renderTheirItems(inventory);
+      }, { onlyOnce: true });
+    }
+
+    function renderTheirItems(inventory) {
+      const container = document.getElementById('theirItemsSelector');
+      container.innerHTML = '';
+
+      Object.values(inventory).forEach(item => {
+        if (item.count > 0) {
+          const itemData = items.find(i => i.name === item.name);
+          const div = document.createElement('div');
+          div.className = 'selectable-item rarity-' + itemData.rarityClass;
+          div.onclick = () => toggleItemSelection(item.name, 'their');
+          div.innerHTML = `
+            <div class="icon">${itemData.icon}</div>
+            <div class="count">x${item.count}</div>
+          `;
+          div.id = 'theiritem-' + item.name;
+          container.appendChild(div);
+        }
+      });
+    }
+
+    function toggleItemSelection(itemName, type) {
+      const array = type === 'my' ? selectedMyItems : selectedTheirItems;
+      const prefix = type === 'my' ? 'myitem-' : 'theiritem-';
+      const element = document.getElementById(prefix + itemName);
+
+      const index = array.indexOf(itemName);
+      if (index > -1) {
+        array.splice(index, 1);
+        element.classList.remove('selected');
+      } else {
+        array.push(itemName);
+        element.classList.add('selected');
+      }
+    }
+
+    window.sendTradeOffer = function() {
+      if (selectedMyItems.length === 0 && selectedTheirItems.length === 0) {
+        alert('Debes seleccionar al menos un objeto');
+        return;
+      }
+
+      const tradeData = {
+        from: gameState.userId,
+        fromUsername: gameState.username,
+        to: currentTradeTarget.userId,
+        toUsername: currentTradeTarget.username,
+        offeredItems: selectedMyItems,
+        requestedItems: selectedTheirItems,
+        timestamp: Date.now()
+      };
+
+      const tradeRef = window.dbPush(window.dbRef(window.database, 'trades/' + currentTradeTarget.userId));
+      window.dbSet(tradeRef, tradeData);
+
+      alert('¡Oferta enviada! 🎉');
+      cancelTrade();
+    };
+
+    window.cancelTrade = function() {
+      currentTradeTarget = null;
+      selectedMyItems = [];
+      selectedTheirItems = [];
+      document.getElementById('createTradeBox').style.display = 'none';
+    };
+
+    function updateTradeOffers(trades) {
+      const container = document.getElementById('tradeOffers');
+      container.innerHTML = '';
+
+      Object.entries(trades).forEach(([tradeId, trade]) => {
+        const offerDiv = document.createElement('div');
+        offerDiv.className = 'trade-offer';
+        
+        const offeredItemsHTML = trade.offeredItems.map(itemName => {
+          const item = items.find(i => i.name === itemName);
+          return `<div class="trade-offer-item rarity-${item.rarityClass}">${item.icon}</div>`;
+        }).join('');
+
+        const requestedItemsHTML = trade.requestedItems.map(itemName => {
+          const item = items.find(i => i.name === itemName);
+          return `<div class="trade-offer-item rarity-${item.rarityClass}">${item.icon}</div>`;
+        }).join('');
+
+        offerDiv.innerHTML = `
+          <div class="trade-offer-header">
+            <strong>De: ${trade.fromUsername}</strong>
+            <span style="font-size: 0.8rem; color: #9ca3af;">${new Date(trade.timestamp).toLocaleString()}</span>
+          </div>
+          <div>
+            <p>🎁 Ofrece:</p>
+            <div class="trade-offer-items">${offeredItemsHTML || '<span style="color: #9ca3af;">Nada</span>'}</div>
+          </div>
+          <div>
+            <p>📥 Solicita:</p>
+            <div class="trade-offer-items">${requestedItemsHTML || '<span style="color: #9ca3af;">Nada</span>'}</div>
+          </div>
+          <div class="trade-actions">
+            <button class="btn accept-btn" onclick="acceptTrade('${tradeId}', '${trade.from}', ${JSON.stringify(trade.offeredItems)}, ${JSON.stringify(trade.requestedItems)})">✅ Aceptar</button>
+            <button class="btn reject-btn" onclick="rejectTrade('${tradeId}')">❌ Rechazar</button>
+          </div>
+        `;
+        
+        container.appendChild(offerDiv);
+      });
+
+      if (container.children.length === 0) {
+        container.innerHTML = '<p style="color: #9ca3af;">No tienes ofertas pendientes</p>';
+      }
+    }
+
+    window.acceptTrade = function(tradeId, fromUserId, offeredItems, requestedItems) {
+      const hasRequestedItems = requestedItems.every(itemName => {
+        return gameState.inventory[itemName] && gameState.inventory[itemName].count > 0;
+      });
+
+      if (!hasRequestedItems) {
+        alert('No tienes todos los objetos solicitados');
+        return;
+      }
+
+      requestedItems.forEach(itemName => {
+        gameState.inventory[itemName].count--;
+        if (gameState.inventory[itemName].count === 0) {
+          delete gameState.inventory[itemName];
+        }
+      });
+
+      offeredItems.forEach(itemName => {
+        const itemData = items.find(i => i.name === itemName);
+        if (!gameState.inventory[itemName]) {
+          gameState.inventory[itemName] = { ...itemData, count: 0 };
+        }
+        gameState.inventory[itemName].count++;
+      });
+
+      saveGame();
+      syncInventoryToFirebase();
+      updateUI();
+
+      window.dbRemove(window.dbRef(window.database, 'trades/' + gameState.userId + '/' + tradeId));
+
+      alert('¡Tradeo completado exitosamente! 🎉');
+    };
+
+    window.rejectTrade = function(tradeId) {
+      window.dbRemove(window.dbRef(window.database, 'trades/' + gameState.userId + '/' + tradeId));
+    };
+
+    function syncInventoryToFirebase() {
+      window.dbSet(window.dbRef(window.database, 'userInventories/' + gameState.userId), gameState.inventory);
+    }
+
     function loadGame() {
       const saved = localStorage.getItem('lootboxGame');
       if (saved) {
-        gameState = JSON.parse(saved);
+        const loaded = JSON.parse(saved);
+        if (loaded.username) {
+          gameState = loaded;
+          document.getElementById('usernameModal').style.display = 'none';
+          document.getElementById('username').textContent = gameState.username;
+          document.getElementById('welcomeText').textContent = `¡Bienvenido ${gameState.username}! 🎮`;
+          connectToFirebase();
+        }
       }
       updateUI();
     }
 
     function saveGame() {
       localStorage.setItem('lootboxGame', JSON.stringify(gameState));
+      if (gameState.userId) {
+        syncInventoryToFirebase();
+      }
     }
 
     function updateUI() {
@@ -459,11 +1070,11 @@
       });
     }
 
-    function gainCoins() {
+    window.gainCoins = function() {
       gameState.coins += 50;
       saveGame();
       updateUI();
-    }
+    };
 
     function getRandomItem(weights) {
       const total = weights.reduce((a, b) => a + b, 0);
@@ -488,7 +1099,7 @@
       return items[0];
     }
 
-    function openChest(type) {
+    window.openChest = function(type) {
       const chestConfig = chestTypes[type];
       
       if (gameState.coins < chestConfig.cost) {
@@ -515,7 +1126,7 @@
         saveGame();
         updateUI();
       }, 600);
-    }
+    };
 
     function showReward(item) {
       const modal = document.getElementById('rewardModal');
@@ -530,9 +1141,9 @@
       modal.classList.add('show');
     }
 
-    function closeModal() {
+    window.closeModal = function() {
       document.getElementById('rewardModal').classList.remove('show');
-    }
+    };
 
     function updateInventory() {
       const grid = document.getElementById('inventoryGrid');
@@ -558,7 +1169,7 @@
       document.getElementById('totalValue').textContent = totalValue;
     }
 
-    function sellItem(itemName) {
+    window.sellItem = function(itemName) {
       if (gameState.inventory[itemName] && gameState.inventory[itemName].count > 0) {
         const item = gameState.inventory[itemName];
         gameState.coins += item.value;
@@ -571,9 +1182,9 @@
         saveGame();
         updateUI();
       }
-    }
+    };
 
-    function sellAll() {
+    window.sellAll = function() {
       let totalEarned = 0;
 
       Object.values(gameState.inventory).forEach(item => {
@@ -589,9 +1200,22 @@
 
         alert(`¡Has vendido todo tu inventario por ${totalEarned} monedas! 💰`);
       }
-    }
+    };
+
+    window.switchTab = function(tab) {
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+
+      if (tab === 'game') {
+        document.querySelectorAll('.tab')[0].classList.add('active');
+        document.getElementById('gameTab').classList.add('active');
+      } else if (tab === 'trade') {
+        document.querySelectorAll('.tab')[1].classList.add('active');
+        document.getElementById('tradeTab').classList.add('active');
+      }
+    };
 
     loadGame();
   </script>
 </body>
-  </html>
+</html>
