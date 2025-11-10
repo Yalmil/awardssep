@@ -730,8 +730,8 @@
 // Objetos
     
     const items = [
-      { name: 'Piedra', icon: '🪨', rarity: 'común', rarityClass: 'common', value: 10 },
-      { name: 'Madera', icon: '🪵', rarity: 'común', rarityClass: 'common', value: 12 },
+      { name: 'Diamante', icon: '💎', rarity: 'común', rarityClass: 'common', value: 10 },
+      { name: 'Oro', icon: '🪙', rarity: 'común', rarityClass: 'common', value: 12 },
       { name: 'Pluma', icon: '🪶', rarity: 'común', rarityClass: 'common', value: 15 },
       { name: 'Hoja', icon: '🍃', rarity: 'común', rarityClass: 'common', value: 8 },
       { name: 'Cristal', icon: '💠', rarity: 'poco común', rarityClass: 'uncommon', value: 40 },
@@ -1077,7 +1077,7 @@
     }
 
     window.gainCoins = function() {
-      gameState.coins += 10;
+      gameState.coins += 10000;
       saveGame();
       updateUI();
     };
