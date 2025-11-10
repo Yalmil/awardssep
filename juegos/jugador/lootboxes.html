@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lootboxes Gratis - Yalmil.com</title>
+  <link rel="icon" href="https://cdn.discordapp.com/emojis/1416607460201857168.png?v=1" type="image/png">
+  <meta property="og:title" content="Yalmil.com" />
+  <meta property="og:description" content="Abre cofres misteriosos y colecciona objetos épicos sin gastar dinero real" />
+  <meta property="og:image" content="https://cdn.discordapp.com/attachments/1355008732576088204/1402309070014124102/Screenshot_20250804-221210.png?ex=68937197&is=68922017&hm=1fa6f462304b2b8cf8a0875053730f988d725d114fbf2648fcb87ee1b67b6a76&" />
+  <meta property="og:url" content="https://yalmil.github.io/Yalmil.com/" />
+  <meta property="og:type" content="website" />
+  
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(135deg, #0a0a0a, #1a001f);
+      color: #e5ccff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      min-height: 100vh;
+      padding: 2rem 1rem;
+      animation: fadeIn 1s ease-out;
+      text-align: center;
+      overflow-x: hidden;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    h1 {
+      margin: 1rem 0 0.5rem;
+      font-size: 2.5rem;
+      color: #c084fc;
+      text-shadow: 0 0 10px #c084fc;
+    }
+
+    p {
+      font-size: 1.2rem;
+      color: #e5ccff;
+      text-shadow: 0 0 6px #c084fc88;
+    }
+
+    .stats {
+      display: flex;
+      gap: 2rem;
+      margin: 1.5rem 0;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .stat-box {
+      background: rgba(40, 0, 60, 0.4);
+      border: 2px solid #c084fc;
+      border-radius: 1rem;
+      padding: 1rem 2rem;
+      box-shadow: 0 0 15px #c084fc44;
+    }
+
+    .stat-box h3 {
+      margin: 0;
+      font-size: 1rem;
+      color: #e5ccff;
+    }
+
+    .stat-box .value {
+      font-size: 2rem;
+      color: #c084fc;
+      font-weight: 600;
+      text-shadow: 0 0 10px #c084fc;
+    }
+
+    .chest-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 2rem;
+      margin: 2rem 0;
+      justify-content: center;
+      max-width: 1200px;
+    }
+
+    .chest {
+      width: 150px;
+      height: 150px;
+      background: rgba(40, 0, 60, 0.25);
+      border: 3px solid #c084fc;
+      border-radius: 1rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-size: 3rem;
+      cursor: pointer;
+      box-shadow: 0 0 20px #c084fc44;
+      color: #fff;
+      transition: transform 0.2s, box-shadow 0.2s;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .chest:hover {
+      transform: scale(1.1) translateY(-5px);
+      box-shadow: 0 0 30px #c084fc88;
+    }
+
+    .chest-label {
+      font-size: 0.9rem;
+      margin-top: 0.5rem;
+      color: #e5ccff;
+    }
+
+    .chest-cost {
+      font-size: 0.8rem;
+      color: #ffd700;
+      margin-top: 0.3rem;
+    }
+
+    .chest.disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .chest.disabled:hover {
+      transform: none;
+      box-shadow: 0 0 20px #c084fc44;
+    }
+
+    @keyframes chestOpen {
+      0% { transform: scale(1) rotate(0deg); }
+      25% { transform: scale(1.2) rotate(-5deg); }
+      50% { transform: scale(1.3) rotate(5deg); }
+      75% { transform: scale(1.2) rotate(-5deg); }
+      100% { transform: scale(0) rotate(180deg); }
+    }
+
+    .opening {
+      animation: chestOpen 0.6s ease-out forwards;
+    }
+
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.85);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal.show {
+      display: flex;
+      animation: fadeIn 0.3s ease-out;
+    }
+
+    .modal-content {
+      background: linear-gradient(135deg, #1a001f, #2d0040);
+      border: 3px solid;
+      border-radius: 1.5rem;
+      padding: 2rem;
+      max-width: 400px;
+      width: 90%;
+      text-align: center;
+      box-shadow: 0 0 40px;
+      animation: modalPop 0.5s ease-out;
+    }
+
+    @keyframes modalPop {
+      0% { transform: scale(0.5); opacity: 0; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+
+    .rarity-common { border-color: #9ca3af; box-shadow: 0 0 40px #9ca3af; }
+    .rarity-uncommon { border-color: #10b981; box-shadow: 0 0 40px #10b981; }
+    .rarity-rare { border-color: #3b82f6; box-shadow: 0 0 40px #3b82f6; }
+    .rarity-epic { border-color: #a855f7; box-shadow: 0 0 40px #a855f7; }
+    .rarity-legendary { border-color: #fbbf24; box-shadow: 0 0 40px #fbbf24; }
+
+    .reward-icon {
+      font-size: 5rem;
+      margin: 1rem 0;
+      animation: rewardFloat 1s ease-in-out infinite;
+    }
+
+    @keyframes rewardFloat {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-10px); }
+    }
+
+    .reward-name {
+      font-size: 1.5rem;
+      font-weight: 600;
+      margin: 0.5rem 0;
+    }
+
+    .reward-rarity {
+      font-size: 1rem;
+      margin: 0.5rem 0;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+    }
+
+    .reward-value {
+      font-size: 1.3rem;
+      color: #ffd700;
+      margin: 0.5rem 0;
+      font-weight: 600;
+      text-shadow: 0 0 10px #ffd700;
+    }
+
+    .btn {
+      background: linear-gradient(135deg, #c084fc, #a855f7);
+      border: none;
+      color: white;
+      padding: 1rem 2rem;
+      font-size: 1rem;
+      font-weight: 600;
+      border-radius: 0.5rem;
+      cursor: pointer;
+      margin-top: 1rem;
+      transition: transform 0.2s;
+    }
+
+    .btn:hover {
+      transform: scale(1.05);
+    }
+
+    .inventory {
+      max-width: 900px;
+      width: 100%;
+      margin-top: 2rem;
+    }
+
+    .inventory h2 {
+      color: #c084fc;
+      text-shadow: 0 0 10px #c084fc;
+    }
+
+    .inventory-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+
+    .inventory-item {
+      background: rgba(40, 0, 60, 0.4);
+      border: 2px solid;
+      border-radius: 0.8rem;
+      padding: 1rem;
+      text-align: center;
+      box-shadow: 0 0 10px;
+    }
+
+    .inventory-item .icon {
+      font-size: 2rem;
+    }
+
+    .inventory-item .name {
+      font-size: 0.8rem;
+      margin-top: 0.5rem;
+      word-wrap: break-word;
+    }
+
+    .inventory-item .count {
+      font-size: 0.7rem;
+      color: #ffd700;
+      margin-top: 0.3rem;
+    }
+
+    .inventory-item .value {
+      font-size: 0.7rem;
+      color: #10b981;
+      margin-top: 0.2rem;
+    }
+
+    .inventory-item .sell-btn {
+      background: linear-gradient(135deg, #10b981, #059669);
+      border: none;
+      color: white;
+      padding: 0.4rem 0.8rem;
+      font-size: 0.7rem;
+      font-weight: 600;
+      border-radius: 0.4rem;
+      cursor: pointer;
+      margin-top: 0.5rem;
+      transition: transform 0.2s;
+      width: 100%;
+    }
+
+    .inventory-item .sell-btn:hover {
+      transform: scale(1.05);
+    }
+
+    .sell-all-btn {
+      background: linear-gradient(135deg, #10b981, #059669);
+      border: none;
+      color: white;
+      padding: 1rem 2rem;
+      font-size: 1rem;
+      font-weight: 600;
+      border-radius: 0.5rem;
+      cursor: pointer;
+      margin-top: 1rem;
+      transition: transform 0.2s;
+    }
+
+    .sell-all-btn:hover {
+      transform: scale(1.05);
+    }
+
+    .inventory-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .inventory-value {
+      color: #10b981;
+      font-size: 1.2rem;
+      text-shadow: 0 0 10px #10b981;
+    }
+  </style>
+</head>
+<body>
+  <h1>🎁 Lootboxes Místicas</h1>
+  <p>¡Gana monedas y abre cofres para obtener objetos épicos!</p>
+
+  <div class="stats">
+    <div class="stat-box">
+      <h3>💰 Monedas</h3>
+      <div class="value" id="coins">0</div>
+    </div>
+    <div class="stat-box">
+      <h3>📦 Cofres Abiertos</h3>
+      <div class="value" id="chestsOpened">0</div>
+    </div>
+  </div>
+
+  <button class="btn" onclick="gainCoins()">🎲 Ganar Monedas (+50)</button>
+
+  <div class="chest-container">
+    <div class="chest" onclick="openChest('basic')" id="basicChest">
+      <div>📦</div>
+      <div class="chest-label">Cofre Básico</div>
+      <div class="chest-cost">50 monedas</div>
+    </div>
+    <div class="chest" onclick="openChest('silver')" id="silverChest">
+      <div>🎁</div>
+      <div class="chest-label">Cofre de Plata</div>
+      <div class="chest-cost">150 monedas</div>
+    </div>
+    <div class="chest" onclick="openChest('gold')" id="goldChest">
+      <div>💎</div>
+      <div class="chest-label">Cofre de Oro</div>
+      <div class="chest-cost">400 monedas</div>
+    </div>
+  </div>
+
+  <div class="inventory">
+    <div class="inventory-header">
+      <h2>🎒 Tu Inventario</h2>
+      <div>
+        <div class="inventory-value">Valor Total: <span id="totalValue">0</span> 💰</div>
+        <button class="sell-all-btn" onclick="sellAll()">💰 Vender Todo</button>
+      </div>
+    </div>
+    <div class="inventory-grid" id="inventoryGrid"></div>
+  </div>
+
+  <div class="modal" id="rewardModal">
+    <div class="modal-content" id="modalContent">
+      <div class="reward-icon" id="rewardIcon"></div>
+      <div class="reward-name" id="rewardName"></div>
+      <div class="reward-rarity" id="rewardRarity"></div>
+      <div class="reward-value" id="rewardValue"></div>
+      <button class="btn" onclick="closeModal()">¡Genial!</button>
+    </div>
+  </div>
+
+  <script>
+    const items = [
+      // Común
+      { name: 'Piedra', icon: '🪨', rarity: 'común', rarityClass: 'common', value: 10 },
+      { name: 'Madera', icon: '🪵', rarity: 'común', rarityClass: 'common', value: 12 },
+      { name: 'Pluma', icon: '🪶', rarity: 'común', rarityClass: 'common', value: 15 },
+      { name: 'Hoja', icon: '🍃', rarity: 'común', rarityClass: 'common', value: 8 },
+      // Poco común
+      { name: 'Cristal', icon: '💠', rarity: 'poco común', rarityClass: 'uncommon', value: 40 },
+      { name: 'Esmeralda', icon: '💚', rarity: 'poco común', rarityClass: 'uncommon', value: 45 },
+      { name: 'Perla', icon: '🔮', rarity: 'poco común', rarityClass: 'uncommon', value: 50 },
+      // Raro
+      { name: 'Rubí', icon: '💎', rarity: 'raro', rarityClass: 'rare', value: 120 },
+      { name: 'Zafiro', icon: '💙', rarity: 'raro', rarityClass: 'rare', value: 130 },
+      { name: 'Estrella', icon: '⭐', rarity: 'raro', rarityClass: 'rare', value: 150 },
+      // Épico
+      { name: 'Corona', icon: '👑', rarity: 'épico', rarityClass: 'epic', value: 350 },
+      { name: 'Espada Mágica', icon: '⚔️', rarity: 'épico', rarityClass: 'epic', value: 380 },
+      { name: 'Escudo Místico', icon: '🛡️', rarity: 'épico', rarityClass: 'epic', value: 400 },
+      // Legendario
+      { name: 'Trofeo Dorado', icon: '🏆', rarity: 'legendario', rarityClass: 'legendary', value: 1000 },
+      { name: 'Dragón', icon: '🐉', rarity: 'legendario', rarityClass: 'legendary', value: 1200 },
+      { name: 'Unicornio', icon: '🦄', rarity: 'legendario', rarityClass: 'legendary', value: 1500 }
+    ];
+
+    const chestTypes = {
+      basic: { cost: 50, weights: [60, 25, 10, 4, 1] },
+      silver: { cost: 150, weights: [30, 40, 20, 8, 2] },
+      gold: { cost: 400, weights: [10, 25, 35, 20, 10] }
+    };
+
+    let gameState = {
+      coins: 100,
+      chestsOpened: 0,
+      inventory: {}
+    };
+
+    function loadGame() {
+      const saved = localStorage.getItem('lootboxGame');
+      if (saved) {
+        gameState = JSON.parse(saved);
+      }
+      updateUI();
+    }
+
+    function saveGame() {
+      localStorage.setItem('lootboxGame', JSON.stringify(gameState));
+    }
+
+    function updateUI() {
+      document.getElementById('coins').textContent = gameState.coins;
+      document.getElementById('chestsOpened').textContent = gameState.chestsOpened;
+      updateChestButtons();
+      updateInventory();
+    }
+
+    function updateChestButtons() {
+      Object.keys(chestTypes).forEach(type => {
+        const chest = document.getElementById(type + 'Chest');
+        const cost = chestTypes[type].cost;
+        if (gameState.coins < cost) {
+          chest.classList.add('disabled');
+        } else {
+          chest.classList.remove('disabled');
+        }
+      });
+    }
+
+    function gainCoins() {
+      gameState.coins += 50;
+      saveGame();
+      updateUI();
+    }
+
+    function getRandomItem(weights) {
+      const total = weights.reduce((a, b) => a + b, 0);
+      let random = Math.random() * total;
+      
+      const rarityRanges = [
+        items.filter(i => i.rarityClass === 'common'),
+        items.filter(i => i.rarityClass === 'uncommon'),
+        items.filter(i => i.rarityClass === 'rare'),
+        items.filter(i => i.rarityClass === 'epic'),
+        items.filter(i => i.rarityClass === 'legendary')
+      ];
+
+      for (let i = 0; i < weights.length; i++) {
+        if (random < weights[i]) {
+          const itemsInRarity = rarityRanges[i];
+          return itemsInRarity[Math.floor(Math.random() * itemsInRarity.length)];
+        }
+        random -= weights[i];
+      }
+      
+      return items[0];
+    }
+
+    function openChest(type) {
+      const chestConfig = chestTypes[type];
+      
+      if (gameState.coins < chestConfig.cost) {
+        return;
+      }
+
+      gameState.coins -= chestConfig.cost;
+      gameState.chestsOpened++;
+
+      const chestElement = document.getElementById(type + 'Chest');
+      chestElement.classList.add('opening');
+
+      setTimeout(() => {
+        const reward = getRandomItem(chestConfig.weights);
+        
+        if (!gameState.inventory[reward.name]) {
+          gameState.inventory[reward.name] = { ...reward, count: 0 };
+        }
+        gameState.inventory[reward.name].count++;
+
+        showReward(reward);
+        chestElement.classList.remove('opening');
+        
+        saveGame();
+        updateUI();
+      }, 600);
+    }
+
+    function showReward(item) {
+      const modal = document.getElementById('rewardModal');
+      const content = document.getElementById('modalContent');
+      
+      content.className = 'modal-content rarity-' + item.rarityClass;
+      document.getElementById('rewardIcon').textContent = item.icon;
+      document.getElementById('rewardName').textContent = item.name;
+      document.getElementById('rewardRarity').textContent = item.rarity;
+      document.getElementById('rewardValue').textContent = `💰 Valor: ${item.value} monedas`;
+      
+      modal.classList.add('show');
+    }
+
+    function closeModal() {
+      document.getElementById('rewardModal').classList.remove('show');
+    }
+
+    function updateInventory() {
+      const grid = document.getElementById('inventoryGrid');
+      grid.innerHTML = '';
+
+      let totalValue = 0;
+
+      Object.values(gameState.inventory).forEach(item => {
+        totalValue += item.value * item.count;
+        
+        const div = document.createElement('div');
+        div.className = 'inventory-item rarity-' + item.rarityClass;
+        div.innerHTML = `
+          <div class="icon">${item.icon}</div>
+          <div class="name">${item.name}</div>
+          <div class="count">x${item.count}</div>
+          <div class="value">💰 ${item.value} c/u</div>
+          <button class="sell-btn" onclick="sellItem('${item.name}')">Vender x1</button>
+        `;
+        grid.appendChild(div);
+      });
+
+      document.getElementById('totalValue').textContent = totalValue;
+    }
+
+    function sellItem(itemName) {
+      if (gameState.inventory[itemName] && gameState.inventory[itemName].count > 0) {
+        const item = gameState.inventory[itemName];
+        gameState.coins += item.value;
+        item.count--;
+
+        if (item.count === 0) {
+          delete gameState.inventory[itemName];
+        }
+
+        saveGame();
+        updateUI();
+      }
+    }
+
+    function sellAll() {
+      let totalEarned = 0;
+
+      Object.values(gameState.inventory).forEach(item => {
+        totalEarned += item.value * item.count;
+      });
+
+      if (totalEarned > 0) {
+        gameState.coins += totalEarned;
+        gameState.inventory = {};
+        
+        saveGame();
+        updateUI();
+
+        alert(`¡Has vendido todo tu inventario por ${totalEarned} monedas! 💰`);
+      }
+    }
+
+    loadGame();
+  </script>
+</body>
+  </html>
