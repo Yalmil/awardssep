@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Lootboxes Gratis - Yalmil.com</title>
+  <title>Lootboxes - Yalmil.com</title>
   <link rel="icon" href="https://cdn.discordapp.com/emojis/1416607460201857168.png?v=1" type="image/png">
   <meta property="og:title" content="Yalmil.com" />
   <meta property="og:description" content="Abre cofres misteriosos, colecciona objetos épicos y tradea con otros jugadores" />
@@ -708,7 +708,7 @@
     </div>
   </div>
 
-  <h1>🎁 Lootboxes Místicas</h1>
+  <h1>🎁 Lootboxes</h1>
   <p id="welcomeText">¡Gana monedas, abre cofres y tradea con otros!</p>
 
   <div class="tabs">
@@ -736,8 +736,8 @@
 
     <div class="chest-container">
       <div class="chest" onclick="openChest('basic')" id="basicChest">
-        <div>❓</div>
-        <div class="chest-label">Placeholder</div>
+        <div>🧪❓</div>
+        <div class="chest-label">RNDM</div>
         <div class="chest-cost">150 monedas</div>
       </div>
       <div class="chest" onclick="openChest('silver')" id="silverChest">
@@ -816,6 +816,8 @@
   </div>
 
   <script type="module">
+
+    // Firebase
     import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
     import { getDatabase, ref, set, onValue, push, remove, update } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
 
@@ -841,6 +843,8 @@
     window.dbRemove = remove;
     window.dbUpdate = update;
 
+
+    // Objetos
     const items = [
       { name: 'Diamante', icon: '💎', rarity: 'común', rarityClass: 'common', value: 8 },
       { name: 'Oro', icon: '🪙', rarity: 'común', rarityClass: 'common', value: 12 },
@@ -863,6 +867,7 @@
 
     window.items = items;
 
+    // Precios y recompensas
     const chestPools = {
       basic: {
         cost: 150,
@@ -880,7 +885,7 @@
         weights: [30, 25, 15, 12, 8, 5, 3, 1, 0.8, 0.1, 0.1]
       }
     };
-
+// Estadísticas iniciales
     let gameState = {
       username: '',
       userId: '',
@@ -889,6 +894,9 @@
       inventory: {}
     };
 
+
+    // IDK
+    // TODO: Ctm, arreglen este código de ###
     let currentTradeTarget = null;
     let selectedMyItems = [];
     let selectedTheirItems = [];
