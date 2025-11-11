@@ -258,6 +258,115 @@
       text-shadow: 0 0 10px #ffd700;
     }
 
+    .special-item {
+      background: linear-gradient(135deg, #fbbf24, #f59e0b);
+      padding: 0.2rem 0.6rem;
+      border-radius: 0.4rem;
+      font-weight: 600;
+      font-size: 0.75rem;
+      display: inline-block;
+      margin-top: 0.5rem;
+      box-shadow: 0 0 10px #fbbf2488;
+      animation: specialGlow 2s infinite;
+    }
+
+    @keyframes specialGlow {
+      0%, 100% { box-shadow: 0 0 10px #fbbf2488; }
+      50% { box-shadow: 0 0 20px #fbbf24; }
+    }
+
+    .roulette-container {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.95);
+      z-index: 1500;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+    }
+
+    .roulette-container.show {
+      display: flex;
+    }
+
+    .roulette-wrapper {
+      position: relative;
+      width: 90%;
+      max-width: 600px;
+      height: 150px;
+      overflow: hidden;
+      border: 3px solid #c084fc;
+      border-radius: 1rem;
+      background: rgba(26, 0, 31, 0.8);
+    }
+
+    .roulette-track {
+      display: flex;
+      gap: 1rem;
+      position: absolute;
+      transition: transform 3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+      padding: 1rem;
+    }
+
+    .roulette-item {
+      min-width: 120px;
+      height: 120px;
+      background: rgba(40, 0, 60, 0.6);
+      border: 3px solid;
+      border-radius: 1rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 0 20px;
+    }
+
+    .roulette-item .icon {
+      font-size: 3rem;
+    }
+
+    .roulette-item .name {
+      font-size: 0.7rem;
+      margin-top: 0.5rem;
+      text-align: center;
+      padding: 0 0.3rem;
+    }
+
+    .roulette-indicator {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 4px;
+      height: 140px;
+      background: linear-gradient(180deg, transparent, #c084fc, transparent);
+      box-shadow: 0 0 20px #c084fc;
+      pointer-events: none;
+      z-index: 10;
+    }
+
+    .roulette-skip {
+      margin-top: 2rem;
+      background: rgba(192, 132, 252, 0.3);
+      border: 2px solid #c084fc;
+      color: #e5ccff;
+      padding: 0.8rem 1.5rem;
+      font-size: 0.9rem;
+      font-weight: 600;
+      border-radius: 0.5rem;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .roulette-skip:hover {
+      background: rgba(192, 132, 252, 0.5);
+      transform: scale(1.05);
+    }
+
     .btn {
       background: linear-gradient(135deg, #c084fc, #a855f7);
       border: none;
@@ -628,17 +737,17 @@
     <div class="chest-container">
       <div class="chest" onclick="openChest('basic')" id="basicChest">
         <div>📦</div>
-        <div class="chest-label">Cofre placeholder</div>
+        <div class="chest-label">Cofre Básico</div>
         <div class="chest-cost">50 monedas</div>
       </div>
       <div class="chest" onclick="openChest('silver')" id="silverChest">
         <div>🎁</div>
-        <div class="chest-label">Cofre V7</div>
+        <div class="chest-label">Cofre de Plata</div>
         <div class="chest-cost">150 monedas</div>
       </div>
       <div class="chest" onclick="openChest('gold')" id="goldChest">
         <div>💎</div>
-        <div class="chest-label">Cofre RE</div>
+        <div class="chest-label">Cofre de Oro</div>
         <div class="chest-cost">400 monedas</div>
       </div>
     </div>
@@ -698,6 +807,14 @@
     </div>
   </div>
 
+  <div class="roulette-container" id="rouletteContainer">
+    <div class="roulette-wrapper">
+      <div class="roulette-indicator"></div>
+      <div class="roulette-track" id="rouletteTrack"></div>
+    </div>
+    <button class="roulette-skip" onclick="skipRoulette()">⏩ Saltar Animación</button>
+  </div>
+
   <script type="module">
     import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
     import { getDatabase, ref, set, onValue, push, remove, update } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
@@ -740,16 +857,28 @@
       { name: 'Una letra', icon: '📝', rarity: 'épico', rarityClass: 'epic', value: 300 },
       { name: 'Doors', icon: '🥊', rarity: 'legendario', rarityClass: 'legendary', value: 350 },
       { name: 'You got mail', icon: '✉️', rarity: 'legendario', rarityClass: 'legendary', value: 1200 },
-      { name: 'Exclusivini combinasione [Solo 10 unidades]', icon: '🐈‍⬛', rarity: 'legendario', rarityClass: 'legendary', value; 1450 },
+      { name: 'Exclusivini combinasione [Solo 10 unidades]', icon: '🐈‍⬛', rarity: 'legendario', rarityClass: 'legendary', value: 1450 },
       { name: 'Planeta', icon: '🪐', rarity: 'legendario', rarityClass: 'legendary', value: 1500 }
     ];
 
     window.items = items;
 
-    const chestTypes = {
-      basic: { cost: 150, weights: [60, 25, 10, 4, 1] },
-      silver: { cost: 777, weights: [30, 40, 20, 8, 2] },
-      gold: { cost: 1000, weights: [10, 25, 35, 20, 10] }
+    const chestPools = {
+      basic: {
+        cost: 50,
+        items: ['Diamante', 'Oro', 'Minecraft', 'Perú', 'Jeison', 'MI CASA TIO'],
+        weights: [35, 30, 20, 10, 4, 1]
+      },
+      silver: {
+        cost: 150,
+        items: ['Perú', 'Jeison', 'MI CASA TIO', 'Enderpearl', 'On top (yc)', 'Galaxia', 'Corona esculpida'],
+        weights: [25, 25, 20, 15, 10, 3, 2]
+      },
+      gold: {
+        cost: 400,
+        items: ['Enderpearl', 'On top (yc)', 'Team akyd', 'Galaxia', 'Corona esculpida', 'Espada de Rubí', 'Una letra', 'Doors', 'You got mail', 'Exclusivini combinasione [Solo 10 unidades]', 'Planeta'],
+        weights: [30, 25, 15, 12, 8, 5, 3, 1, 0.8, 0.1, 0.1]
+      }
     };
 
     let gameState = {
@@ -764,6 +893,8 @@
     let selectedMyItems = [];
     let selectedTheirItems = [];
     let onlineUsersData = {};
+    let rouletteSkipped = false;
+    let currentReward = null;
 
     window.setUsername = function() {
       const input = document.getElementById('usernameInput').value.trim();
@@ -1060,9 +1191,9 @@
     }
 
     function updateChestButtons() {
-      Object.keys(chestTypes).forEach(type => {
+      Object.keys(chestPools).forEach(type => {
         const chest = document.getElementById(type + 'Chest');
-        const cost = chestTypes[type].cost;
+        const cost = chestPools[type].cost;
         if (gameState.coins < cost) {
           chest.classList.add('disabled');
         } else {
@@ -1072,36 +1203,29 @@
     }
 
     window.gainCoins = function() {
-      gameState.coins += 10;
+      gameState.coins += 50;
       saveGame();
       updateUI();
     };
 
-    function getRandomItem(weights) {
-      const total = weights.reduce((a, b) => a + b, 0);
+    function getRandomItem(chestType) {
+      const pool = chestPools[chestType];
+      const total = pool.weights.reduce((a, b) => a + b, 0);
       let random = Math.random() * total;
-      
-      const rarityRanges = [
-        items.filter(i => i.rarityClass === 'common'),
-        items.filter(i => i.rarityClass === 'uncommon'),
-        items.filter(i => i.rarityClass === 'rare'),
-        items.filter(i => i.rarityClass === 'epic'),
-        items.filter(i => i.rarityClass === 'legendary')
-      ];
 
-      for (let i = 0; i < weights.length; i++) {
-        if (random < weights[i]) {
-          const itemsInRarity = rarityRanges[i];
-          return itemsInRarity[Math.floor(Math.random() * itemsInRarity.length)];
+      for (let i = 0; i < pool.weights.length; i++) {
+        if (random < pool.weights[i]) {
+          const itemName = pool.items[i];
+          return items.find(item => item.name === itemName);
         }
-        random -= weights[i];
+        random -= pool.weights[i];
       }
       
-      return items[0];
+      return items.find(item => item.name === pool.items[0]);
     }
 
     window.openChest = function(type) {
-      const chestConfig = chestTypes[type];
+      const chestConfig = chestPools[type];
       
       if (gameState.coins < chestConfig.cost) {
         return;
@@ -1114,19 +1238,80 @@
       chestElement.classList.add('opening');
 
       setTimeout(() => {
-        const reward = getRandomItem(chestConfig.weights);
-        
-        if (!gameState.inventory[reward.name]) {
-          gameState.inventory[reward.name] = { ...reward, count: 0 };
-        }
-        gameState.inventory[reward.name].count++;
-
-        showReward(reward);
         chestElement.classList.remove('opening');
+        const reward = getRandomItem(type);
+        currentReward = reward;
+        rouletteSkipped = false;
+        
+        startRoulette(type, reward);
         
         saveGame();
         updateUI();
       }, 600);
+    };
+
+    function startRoulette(chestType, finalReward) {
+      const container = document.getElementById('rouletteContainer');
+      const track = document.getElementById('rouletteTrack');
+      
+      container.classList.add('show');
+      track.innerHTML = '';
+      track.style.transform = 'translateX(0)';
+      track.style.transition = 'transform 3s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
+
+      const pool = chestPools[chestType];
+      const rouletteItems = [];
+      
+      for (let i = 0; i < 30; i++) {
+        const randomItem = items.find(item => item.name === pool.items[Math.floor(Math.random() * pool.items.length)]);
+        rouletteItems.push(randomItem);
+      }
+      
+      const finalIndex = 25;
+      rouletteItems[finalIndex] = finalReward;
+
+      rouletteItems.forEach(item => {
+        const div = document.createElement('div');
+        div.className = 'roulette-item rarity-' + item.rarityClass;
+        div.innerHTML = `
+          <div class="icon">${item.icon}</div>
+          <div class="name">${item.name.replace(/\[.*?\]/g, '')}</div>
+        `;
+        track.appendChild(div);
+      });
+
+      setTimeout(() => {
+        const offset = -(finalIndex * 136) + 240;
+        track.style.transform = `translateX(${offset}px)`;
+      }, 100);
+
+      setTimeout(() => {
+        if (!rouletteSkipped) {
+          finishRoulette(finalReward);
+        }
+      }, 3200);
+    }
+
+    function finishRoulette(reward) {
+      document.getElementById('rouletteContainer').classList.remove('show');
+      
+      if (!gameState.inventory[reward.name]) {
+        gameState.inventory[reward.name] = { ...reward, count: 0 };
+      }
+      gameState.inventory[reward.name].count++;
+      
+      saveGame();
+      updateUI();
+      showReward(reward);
+    }
+
+    window.skipRoulette = function() {
+      if (currentReward && !rouletteSkipped) {
+        rouletteSkipped = true;
+        const track = document.getElementById('rouletteTrack');
+        track.style.transition = 'none';
+        finishRoulette(currentReward);
+      }
     };
 
     function showReward(item) {
@@ -1135,7 +1320,18 @@
       
       content.className = 'modal-content rarity-' + item.rarityClass;
       document.getElementById('rewardIcon').textContent = item.icon;
-      document.getElementById('rewardName').textContent = item.name;
+      
+      const specialMatch = item.name.match(/\[(.*?)\]/);
+      if (specialMatch) {
+        const baseName = item.name.replace(/\[.*?\]/g, '').trim();
+        document.getElementById('rewardName').innerHTML = `
+          ${baseName}<br>
+          <span class="special-item">${specialMatch[1]}</span>
+        `;
+      } else {
+        document.getElementById('rewardName').textContent = item.name;
+      }
+      
       document.getElementById('rewardRarity').textContent = item.rarity;
       document.getElementById('rewardValue').textContent = `💰 Valor: ${item.value} monedas`;
       
@@ -1157,9 +1353,22 @@
         
         const div = document.createElement('div');
         div.className = 'inventory-item rarity-' + item.rarityClass;
+        
+        const specialMatch = item.name.match(/\[(.*?)\]/);
+        let nameHTML = '';
+        if (specialMatch) {
+          const baseName = item.name.replace(/\[.*?\]/g, '').trim();
+          nameHTML = `
+            <div class="name">${baseName}</div>
+            <span class="special-item">${specialMatch[1]}</span>
+          `;
+        } else {
+          nameHTML = `<div class="name">${item.name}</div>`;
+        }
+        
         div.innerHTML = `
           <div class="icon">${item.icon}</div>
-          <div class="name">${item.name}</div>
+          ${nameHTML}
           <div class="count">x${item.count}</div>
           <div class="value">💰 ${item.value} c/u</div>
           <button class="sell-btn" onclick="sellItem('${item.name}')">Vender x1</button>
