@@ -732,13 +732,13 @@
     const items = [
       { name: 'Diamante', icon: '💎', rarity: 'común', rarityClass: 'common', value: 10 },
       { name: 'Oro', icon: '🪙', rarity: 'común', rarityClass: 'common', value: 12 },
-      { name: 'Pluma', icon: '🪶', rarity: 'común', rarityClass: 'common', value: 15 },
-      { name: 'Hoja', icon: '🍃', rarity: 'común', rarityClass: 'common', value: 8 },
-      { name: 'Cristal', icon: '💠', rarity: 'poco común', rarityClass: 'uncommon', value: 40 },
+      { name: 'Minecraft', icon: '🗺️', rarity: 'común', rarityClass: 'common', value: 15 },
+      { name: 'Perú', icon: '🇵🇪', rarity: 'común', rarityClass: 'common', value: 8 },
+      { name: 'Jeison', icon: '🧩', rarity: 'poco común', rarityClass: 'uncommon', value: 40 },
       { name: 'MI CASA TIO', icon: '⚡', rarity: 'poco común', rarityClass: 'uncommon', value: 45 },
-      { name: 'Perla', icon: '🔮', rarity: 'poco común', rarityClass: 'uncommon', value: 50 },
-      { name: 'Rubí', icon: '💎', rarity: 'raro', rarityClass: 'rare', value: 120 },
-      { name: 'Zafiro', icon: '💙', rarity: 'raro', rarityClass: 'rare', value: 130 },
+      { name: 'Enderpearl', icon: '🟣', rarity: 'poco común', rarityClass: 'uncommon', value: 50 },
+      { name: 'On top (yc)', icon: '🔥', rarity: 'raro', rarityClass: 'rare', value: 120 },
+      { name: 'Team akyd', icon: '🔑', rarity: 'raro', rarityClass: 'rare', value: 130 },
       { name: 'Estrella', icon: '⭐', rarity: 'raro', rarityClass: 'rare', value: 150 },
       { name: 'Corona', icon: '👑', rarity: 'épico', rarityClass: 'epic', value: 350 },
       { name: 'Espada Mágica', icon: '⚔️', rarity: 'épico', rarityClass: 'epic', value: 380 },
@@ -754,7 +754,7 @@
     const chestTypes = {
       basic: { cost: 150, weights: [60, 25, 10, 4, 1] },
       silver: { cost: 777, weights: [30, 40, 20, 8, 2] },
-      gold: { cost: 196898, weights: [10, 25, 35, 20, 10] }
+      gold: { cost: 1000, weights: [10, 25, 35, 20, 10] }
     };
 
     let gameState = {
@@ -1075,9 +1075,9 @@
         }
       });
     }
-
+// APC (Amount Per Click)
     window.gainCoins = function() {
-      gameState.coins += 10000;
+      gameState.coins += 25;
       saveGame();
       updateUI();
     };
