@@ -623,23 +623,23 @@
       </div>
     </div>
 
-    <button class="btn" onclick="gainCoins()">🎲 Ganar Monedas (+10)</button>
+    <button class="btn" onclick="gainCoins()">🎲 Ganar Monedas (+50)</button>
 
     <div class="chest-container">
       <div class="chest" onclick="openChest('basic')" id="basicChest">
-        <div>❓</div>
+        <div>📦</div>
         <div class="chest-label">Cofre placeholder</div>
-        <div class="chest-cost">150 monedas</div>
+        <div class="chest-cost">50 monedas</div>
       </div>
       <div class="chest" onclick="openChest('silver')" id="silverChest">
-        <div>🎰</div>
+        <div>🎁</div>
         <div class="chest-label">Cofre V7</div>
-        <div class="chest-cost">777 monedas</div>
+        <div class="chest-cost">150 monedas</div>
       </div>
       <div class="chest" onclick="openChest('gold')" id="goldChest">
-        <div>🐂</div>
+        <div>💎</div>
         <div class="chest-label">Cofre RE</div>
-        <div class="chest-cost">1000 monedas</div>
+        <div class="chest-cost">400 monedas</div>
       </div>
     </div>
 
@@ -699,9 +699,6 @@
   </div>
 
   <script type="module">
-
-    // Firebase
-    
     import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
     import { getDatabase, ref, set, onValue, push, remove, update } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
 
@@ -727,8 +724,6 @@
     window.dbRemove = remove;
     window.dbUpdate = update;
 
-// Objetos
-    
     const items = [
       { name: 'Diamante', icon: '💎', rarity: 'común', rarityClass: 'common', value: 8 },
       { name: 'Oro', icon: '🪙', rarity: 'común', rarityClass: 'common', value: 12 },
@@ -749,7 +744,6 @@
       { name: 'Planeta', icon: '🪐', rarity: 'legendario', rarityClass: 'legendary', value: 1500 }
     ];
 
-    // Apartir de aqui ya no entiendo mi propio código 
     window.items = items;
 
     const chestTypes = {
@@ -1076,9 +1070,9 @@
         }
       });
     }
-// APC (Amount Per Click)
+
     window.gainCoins = function() {
-      gameState.coins += 25;
+      gameState.coins += 10;
       saveGame();
       updateUI();
     };
