@@ -3,33 +3,96 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Yalmil.com</title>
+  <
+    title>Yalmil.com</title>
   <link rel="icon" href="https://cdn.discordapp.com/emojis/1416607460201857168.png?v=1" type="image/png">
   <meta property="og:title" content="Yalmil.com" />
   <meta property="og:description" content="Te unes o mañana duermes para siempre..." />
   <meta property="og:image" content="https://cdn.discordapp.com/attachments/1355008732576088204/1402309070014124102/Screenshot_20250804-221210.png?ex=68937197&is=68922017&hm=1fa6f462304b2b8cf8a0875053730f988d725d114fbf2648fcb87ee1b67b6a76&" />
   <meta property="og:url" content="https://yalmil.github.io/Yalmil.com/" />
-  <meta property="og:type" content="website" /><style>
-  @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
+  <meta property="og:type" content="website" />
+  <style>
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
 
-  * {
-    box-sizing: border-box;
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: 'Poppins', sans-serif;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  min-height: 100vh;
+  padding: 2rem 1rem;
+  text-align: center;
+  overflow-x: hidden;
+  transition: background 0.4s ease, color 0.4s ease;
+}
+
+/* ===== MODO OSCURO ===== */
+@media (prefers-color-scheme: dark) {
+  body {
+    background: linear-gradient(135deg, #0a0a0a, #1a001f);
+    color: #e5ccff;
+    animation: fadeIn 1s ease-out;
   }
 
-  body {
-    margin: 0;
-    font-family: 'Poppins', sans-serif;
-    background: linear-gradient(135deg, #330a00, #662000);
-    color: #ffd8a6;
+  h1 {
+    margin: 1rem 0 0.5rem;
+    font-size: 2.5rem;
+    color: #c084fc;
+    text-shadow: 0 0 10px #c084fc;
+  }
+
+  p {
+    font-size: 1.2rem;
+    color: #e5ccff;
+    text-shadow: 0 0 6px #c084fc88;
+  }
+
+  .chest-container {
     display: flex;
-    flex-direction: column;
-    min-height: 100vh;
-    animation: fadeIn 0.8s ease-out;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin: 2rem 0;
+    justify-content: center;
+    max-width: 1200px;
+  }
+
+  .chest {
+    width: 70px;
+    height: 70px;
+    background: rgba(40, 0, 60, 0.25);
+    border: 2px solid #c084fc;
+    border-radius: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    cursor: pointer;
+    box-shadow: 0 0 10px #c084fc44;
+    color: #fff;
+    transition: transform 0.2s;
+  }
+
+  .chest:hover {
+    transform: scale(1.1);
+    box-shadow: 0 0 15px #c084fc;
   }
 
   @keyframes fadeIn {
     from { opacity: 0; transform: translateY(10px); }
     to { opacity: 1; transform: translateY(0); }
+  }
+}
+
+/* ===== MODO CLARO ===== */
+@media (prefers-color-scheme: light) {
+  body {
+    background: linear-gradient(135deg, #330a00, #662000);
+    color: #ffd8a6;
+    animation: fadeIn 0.8s ease-out;
   }
 
   header {
@@ -104,6 +167,12 @@
     background-color: #330800;
     border-top: 1px solid #662200;
   }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+}
 </style>
 </head>
 <body>
@@ -123,6 +192,7 @@
   </footer>
 </body>
 </html>
+
 
 
 
