@@ -44,6 +44,7 @@ input{padding:8px;width:100%;margin:6px 0;border-radius:6px;border:none}
   <h2>Configurar fecha</h2>
   <input id="nameInput" type="text" placeholder="Nombre del evento">
   <input id="dateInput" type="datetime-local">
+  <h3>Contraseña: forsaken</h3>
   <button id="saveBtn">Guardar</button>
 </div>
 
@@ -94,7 +95,7 @@ dateInput.value = savedDate;
 // ---------------------------
 adminBtn.onclick = () => {
   const pass = prompt("Contraseña");
-  if (pass === "yalmil") {
+  if (pass === "forsaken") {
     configBox.style.display = "block";
   }
 };
